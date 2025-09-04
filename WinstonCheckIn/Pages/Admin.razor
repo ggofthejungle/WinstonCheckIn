@@ -1,60 +1,93 @@
-﻿@page "/weather"
+﻿@using WinstonCheckIn.Services
+@using MudBlazor
+@page "/admin"
 @inject HttpClient Http
+@inject AuthenticationStateService AuthStateService
+@inject NavigationManager Navigation
+@implements IDisposable
 
 <PageTitle>Admin</PageTitle>
 
-<h1>Admin</h1>
+<h1>Admin Dashboard</h1>
 
-<p>This component demonstrates fetching data from the server.</p>
+<p>Welcome to the admin panel. You have successfully logged in!</p>
 
-@if (forecasts == null)
-{
-    <p>
-        <em>Loading...</em>
-    </p>
-}
-else
-{
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Date</th>
-            <th aria-label="Temperature in Celsius">Temp. (C)</th>
-            <th aria-label="Temperature in Farenheit">Temp. (F)</th>
-            <th>Summary</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var forecast in forecasts)
-        {
-            <tr>
-                <td>@forecast.Date.ToShortDateString()</td>
-                <td>@forecast.TemperatureC</td>
-                <td>@forecast.TemperatureF</td>
-                <td>@forecast.Summary</td>
-            </tr>
-        }
-        </tbody>
-    </table>
-}
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <MudCard>
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">Check-In Records</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudTable Items="@checkInRecords" Hover="true" Striped="true" Dense="true">
+                <HeaderContent>
+                    <MudTh>First Name</MudTh>
+                    <MudTh>Last Name</MudTh>
+                    <MudTh>Phone</MudTh>
+                    <MudTh>Paid</MudTh>
+                    <MudTh>Actions</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="First Name">@context.FirstName</MudTd>
+                    <MudTd DataLabel="Last Name">@context.LastName</MudTd>
+                    <MudTd DataLabel="Phone">@context.Phone</MudTd>
+                    <MudTd DataLabel="Paid">
+                        <MudChip T="string" Color="@(context.IsPaid ? Color.Success : Color.Error)" 
+                                Size="Size.Small" 
+                                Variant="Variant.Filled">
+                            @(context.IsPaid ? "Yes" : "No")
+                        </MudChip>
+                    </MudTd>
+                    <MudTd DataLabel="Actions">
+                        <MudButton Variant="Variant.Text" 
+                                  Color="Color.Primary" 
+                                  Size="Size.Small"
+                                  StartIcon="Icons.Material.Filled.Edit">
+                            Edit
+                        </MudButton>
+                        <MudButton Variant="Variant.Text" 
+                                  Color="Color.Error" 
+                                  Size="Size.Small"
+                                  StartIcon="Icons.Material.Filled.Delete">
+                            Delete
+                        </MudButton>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
 
 @code {
-    private WeatherForecast[]? forecasts;
+    private List<CheckInRecord> checkInRecords = new();
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+        // Prepopulate with sample data
+        checkInRecords = new List<CheckInRecord>
+        {
+            new CheckInRecord { FirstName = "John", LastName = "Doe", Phone = "(555) 123-4567", IsPaid = true },
+            new CheckInRecord { FirstName = "Jane", LastName = "Smith", Phone = "(555) 234-5678", IsPaid = false },
+            new CheckInRecord { FirstName = "Mike", LastName = "Johnson", Phone = "(555) 345-6789", IsPaid = true },
+            new CheckInRecord { FirstName = "Sarah", LastName = "Williams", Phone = "(555) 456-7890", IsPaid = true },
+            new CheckInRecord { FirstName = "David", LastName = "Brown", Phone = "(555) 567-8901", IsPaid = false },
+            new CheckInRecord { FirstName = "Lisa", LastName = "Davis", Phone = "(555) 678-9012", IsPaid = true },
+            new CheckInRecord { FirstName = "Tom", LastName = "Wilson", Phone = "(555) 789-0123", IsPaid = false },
+            new CheckInRecord { FirstName = "Amy", LastName = "Miller", Phone = "(555) 890-1234", IsPaid = true }
+        };
     }
 
-    public class WeatherForecast
+    public void Dispose()
     {
-        public DateOnly Date { get; set; }
-
-        public int TemperatureC { get; set; }
-
-        public string? Summary { get; set; }
-
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        // No cleanup needed for this page
     }
 
+    public class CheckInRecord
+    {
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public bool IsPaid { get; set; }
+    }
 }
