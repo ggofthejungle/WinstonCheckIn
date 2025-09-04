@@ -1,0 +1,173 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{2E29DC8B-7404-4022-9FD1-148090DAF6CA}|WinstonCheckIn\\WinstonCheckIn.csproj|c:\\users\\juan2\\documents\\github\\winstoncheckin\\winstoncheckin\\pages\\status.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2E29DC8B-7404-4022-9FD1-148090DAF6CA}|WinstonCheckIn\\WinstonCheckIn.csproj|solutionrelative:winstoncheckin\\pages\\status.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2E29DC8B-7404-4022-9FD1-148090DAF6CA}|WinstonCheckIn\\WinstonCheckIn.csproj|c:\\users\\juan2\\documents\\github\\winstoncheckin\\winstoncheckin\\pages\\status.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{2E29DC8B-7404-4022-9FD1-148090DAF6CA}|WinstonCheckIn\\WinstonCheckIn.csproj|solutionrelative:winstoncheckin\\pages\\status.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2E29DC8B-7404-4022-9FD1-148090DAF6CA}|WinstonCheckIn\\WinstonCheckIn.csproj|c:\\users\\juan2\\documents\\github\\winstoncheckin\\winstoncheckin\\layout\\navmenu.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{2E29DC8B-7404-4022-9FD1-148090DAF6CA}|WinstonCheckIn\\WinstonCheckIn.csproj|solutionrelative:winstoncheckin\\layout\\navmenu.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2E29DC8B-7404-4022-9FD1-148090DAF6CA}|WinstonCheckIn\\WinstonCheckIn.csproj|c:\\users\\juan2\\documents\\github\\winstoncheckin\\winstoncheckin\\layout\\navmenu.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2E29DC8B-7404-4022-9FD1-148090DAF6CA}|WinstonCheckIn\\WinstonCheckIn.csproj|solutionrelative:winstoncheckin\\layout\\navmenu.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2E29DC8B-7404-4022-9FD1-148090DAF6CA}|WinstonCheckIn\\WinstonCheckIn.csproj|c:\\users\\juan2\\documents\\github\\winstoncheckin\\winstoncheckin\\layout\\mainlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2E29DC8B-7404-4022-9FD1-148090DAF6CA}|WinstonCheckIn\\WinstonCheckIn.csproj|solutionrelative:winstoncheckin\\layout\\mainlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2E29DC8B-7404-4022-9FD1-148090DAF6CA}|WinstonCheckIn\\WinstonCheckIn.csproj|c:\\users\\juan2\\documents\\github\\winstoncheckin\\winstoncheckin\\pages\\counter.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2E29DC8B-7404-4022-9FD1-148090DAF6CA}|WinstonCheckIn\\WinstonCheckIn.csproj|solutionrelative:winstoncheckin\\pages\\counter.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2E29DC8B-7404-4022-9FD1-148090DAF6CA}|WinstonCheckIn\\WinstonCheckIn.csproj|c:\\users\\juan2\\documents\\github\\winstoncheckin\\winstoncheckin\\pages\\home.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2E29DC8B-7404-4022-9FD1-148090DAF6CA}|WinstonCheckIn\\WinstonCheckIn.csproj|solutionrelative:winstoncheckin\\pages\\home.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2E29DC8B-7404-4022-9FD1-148090DAF6CA}|WinstonCheckIn\\WinstonCheckIn.csproj|c:\\users\\juan2\\documents\\github\\winstoncheckin\\winstoncheckin\\pages\\weather.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2E29DC8B-7404-4022-9FD1-148090DAF6CA}|WinstonCheckIn\\WinstonCheckIn.csproj|solutionrelative:winstoncheckin\\pages\\weather.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2E29DC8B-7404-4022-9FD1-148090DAF6CA}|WinstonCheckIn\\WinstonCheckIn.csproj|c:\\users\\juan2\\documents\\github\\winstoncheckin\\winstoncheckin\\wwwroot\\css\\app.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{2E29DC8B-7404-4022-9FD1-148090DAF6CA}|WinstonCheckIn\\WinstonCheckIn.csproj|solutionrelative:winstoncheckin\\wwwroot\\css\\app.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Status.razor.css",
+              "DocumentMoniker": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\WinstonCheckIn\\Pages\\Status.razor.css",
+              "RelativeDocumentMoniker": "WinstonCheckIn\\Pages\\Status.razor.css",
+              "ToolTip": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\WinstonCheckIn\\Pages\\Status.razor.css",
+              "RelativeToolTip": "WinstonCheckIn\\Pages\\Status.razor.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-09-04T20:03:20.277Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "NavMenu.razor.css",
+              "DocumentMoniker": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\WinstonCheckIn\\Layout\\NavMenu.razor.css",
+              "RelativeDocumentMoniker": "WinstonCheckIn\\Layout\\NavMenu.razor.css",
+              "ToolTip": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\WinstonCheckIn\\Layout\\NavMenu.razor.css",
+              "RelativeToolTip": "WinstonCheckIn\\Layout\\NavMenu.razor.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-09-04T19:30:28.201Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "app.css",
+              "DocumentMoniker": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\WinstonCheckIn\\wwwroot\\css\\app.css",
+              "RelativeDocumentMoniker": "WinstonCheckIn\\wwwroot\\css\\app.css",
+              "ToolTip": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\WinstonCheckIn\\wwwroot\\css\\app.css",
+              "RelativeToolTip": "WinstonCheckIn\\wwwroot\\css\\app.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-09-04T19:29:17.04Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Status.razor",
+              "DocumentMoniker": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\WinstonCheckIn\\Pages\\Status.razor",
+              "RelativeDocumentMoniker": "WinstonCheckIn\\Pages\\Status.razor",
+              "ToolTip": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\WinstonCheckIn\\Pages\\Status.razor",
+              "RelativeToolTip": "WinstonCheckIn\\Pages\\Status.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAyAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-04T19:23:49.037Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Weather.razor",
+              "DocumentMoniker": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\WinstonCheckIn\\Pages\\Weather.razor",
+              "RelativeDocumentMoniker": "WinstonCheckIn\\Pages\\Weather.razor",
+              "ToolTip": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\WinstonCheckIn\\Pages\\Weather.razor",
+              "RelativeToolTip": "WinstonCheckIn\\Pages\\Weather.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-04T18:31:10.459Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Home.razor",
+              "DocumentMoniker": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\WinstonCheckIn\\Pages\\Home.razor",
+              "RelativeDocumentMoniker": "WinstonCheckIn\\Pages\\Home.razor",
+              "ToolTip": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\WinstonCheckIn\\Pages\\Home.razor",
+              "RelativeToolTip": "WinstonCheckIn\\Pages\\Home.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-04T18:31:07.116Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Counter.razor",
+              "DocumentMoniker": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\WinstonCheckIn\\Pages\\Counter.razor",
+              "RelativeDocumentMoniker": "WinstonCheckIn\\Pages\\Counter.razor",
+              "ToolTip": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\WinstonCheckIn\\Pages\\Counter.razor",
+              "RelativeToolTip": "WinstonCheckIn\\Pages\\Counter.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-04T18:31:00.828Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "NavMenu.razor",
+              "DocumentMoniker": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\WinstonCheckIn\\Layout\\NavMenu.razor",
+              "RelativeDocumentMoniker": "WinstonCheckIn\\Layout\\NavMenu.razor",
+              "ToolTip": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\WinstonCheckIn\\Layout\\NavMenu.razor",
+              "RelativeToolTip": "WinstonCheckIn\\Layout\\NavMenu.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-04T18:25:28.392Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MainLayout.razor",
+              "DocumentMoniker": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\WinstonCheckIn\\Layout\\MainLayout.razor",
+              "RelativeDocumentMoniker": "WinstonCheckIn\\Layout\\MainLayout.razor",
+              "ToolTip": "C:\\Users\\juan2\\Documents\\GitHub\\WinstonCheckIn\\WinstonCheckIn\\Layout\\MainLayout.razor",
+              "RelativeToolTip": "WinstonCheckIn\\Layout\\MainLayout.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-04T18:25:19.617Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

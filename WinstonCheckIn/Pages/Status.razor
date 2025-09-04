@@ -1,0 +1,25 @@
+﻿@page "/Status"
+
+<PageTitle>Status</PageTitle>
+
+<h1>Status</h1>
+
+<div class="pageContainer">
+	<div class="topBar">
+		<h2>@DateTime.Now.ToString("MMMM dd, yyyy")</h2>
+	</div>
+
+	<div class="userList">
+		@foreach (var attendee in Attendees)
+		{
+			<div class="attendeeItem">@attendee</div>
+		}
+	</div>
+</div>
+
+@code {
+	private List<string> Attendees = new List<string>
+	{
+		"Attendee 1", "Attendee 2", "Attendee 3"
+	};
+}
