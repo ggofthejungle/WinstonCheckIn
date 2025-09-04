@@ -1,7 +1,82 @@
-﻿@page "/"
+﻿@using WinstonCheckIn.Services
+@using System.ComponentModel
+@page "/"
+@inject NavigationManager Navigation
+@inject LoginService LoginService
+@inject AuthenticationStateService AuthStateService
+@implements IDisposable
 
 <PageTitle>Home</PageTitle>
 
-<h1></h1>
+<h1>Winston Check-In</h1>
 
 <img src="images/winstonLogo.png" alt="Winston Logo" style="max-width: 200px;" />
+
+@if (AuthStateService.IsAuthenticated)
+{
+    <div style="margin-top: 20px;">
+        <h3>Welcome, @AuthStateService.CurrentUser!</h3>
+        <p>You are successfully logged in.</p>
+        <button @onclick="Logout" class="btn btn-secondary">Logout</button>
+    </div>
+}
+else
+{
+    <div style="margin-top: 20px;">
+        <h3>Admin Login</h3>
+        
+        @if (errorMessage != null)
+        {
+            <p style="color: red;">@errorMessage</p>
+        }
+        
+        <div style="margin-bottom: 10px;">
+            <label>Username:</label>
+            <input @bind="username" style="margin-left: 10px;" />
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label>Password:</label>
+            <input type="password" @bind="password" style="margin-left: 10px;" />
+        </div>
+        <button @onclick="HandleLogin" class="btn btn-primary">Login</button>
+    </div>
+}
+
+@code {
+    private string username = string.Empty;
+    private string password = string.Empty;
+    private string? errorMessage;
+
+    protected override void OnInitialized()
+    {
+        AuthStateService.PropertyChanged += OnAuthStateChanged;
+    }
+
+    private void OnAuthStateChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleLogin()
+    {
+        if (LoginService.Authenticate(username, password))
+        {
+            Navigation.NavigateTo("/admin");
+        }
+        else
+        {
+            errorMessage = "Invalid username or password.";
+        }
+    }
+
+    private void Logout()
+    {
+        AuthStateService.Logout();
+        Navigation.NavigateTo("/");
+    }
+
+    public void Dispose()
+    {
+        AuthStateService.PropertyChanged -= OnAuthStateChanged;
+    }
+}

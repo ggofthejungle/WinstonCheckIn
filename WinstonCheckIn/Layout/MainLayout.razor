@@ -1,4 +1,10 @@
 ﻿@inherits LayoutComponentBase
+@using WinstonCheckIn.Services
+@using System.ComponentModel
+@inject AuthenticationStateService AuthStateService
+@inject NavigationManager Navigation
+@implements IDisposable
+
 <div class="page">
     <div class="sidebar">
         <NavMenu/>
@@ -6,7 +12,11 @@
 
     <main>
         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            @if (AuthStateService.IsAuthenticated)
+            {
+                <span class="text-dark me-3">Welcome, @AuthStateService.CurrentUser!</span>
+                <button @onclick="Logout" class="btn btn-sm btn-outline-dark">Logout</button>
+            }
         </div>
 
         <article class="content px-4">
@@ -24,3 +34,26 @@
 
 @* Needed for snackbars *@
 <MudSnackbarProvider />
+
+@code {
+    protected override void OnInitialized()
+    {
+        AuthStateService.PropertyChanged += OnAuthStateChanged;
+    }
+
+    private void OnAuthStateChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void Logout()
+    {
+        AuthStateService.Logout();
+        Navigation.NavigateTo("/");
+    }
+
+    public void Dispose()
+    {
+        AuthStateService.PropertyChanged -= OnAuthStateChanged;
+    }
+}
