@@ -1,60 +1,238 @@
 ﻿@using WinstonCheckIn.Services
 @using System.ComponentModel
+@using MudBlazor
 @page "/"
 @inject NavigationManager Navigation
 @inject LoginService LoginService
 @inject AuthenticationStateService AuthStateService
+@inject CheckInService CheckInService
 @implements IDisposable
 
 <PageTitle>Home</PageTitle>
 
-<h1>Winston Check-In</h1>
+<style>
+    .form-container {
+        background-color: #ffffff; 
+        padding: 40px;
+        border-radius: 5px; 
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); 
+        width: 350px; 
+        max-width: 90%; 
+        text-align: center;
+        margin: 20px auto;
+    }
 
-<img src="images/winstonLogo.png" alt="Winston Logo" style="max-width: 200px;" />
+    .company-header {
+        margin-bottom: 30px;
+    }
 
-@if (AuthStateService.IsAuthenticated)
-{
-    <div style="margin-top: 20px;">
-        <h3>Welcome, @AuthStateService.CurrentUser!</h3>
-        <p>You are successfully logged in.</p>
-        <button @onclick="Logout" class="btn btn-secondary">Logout</button>
+    .logo {
+        width: 150px; 
+        height: auto;
+        margin-bottom: 5px;
+    }
+
+    .tagline {
+        font-size: 0.8em;
+        color: #666;
+        margin-top: 0;
+    }
+
+    .input-group {
+        margin-bottom: 20px; 
+    }
+
+    input[type="text"],
+    input[type="tel"] {
+        width: calc(100% - 20px); 
+        padding: 15px 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f0f0f0; 
+        color: #666; 
+        font-size: 1.1em;
+        text-align: center;
+        box-sizing: border-box; 
+        font-weight: bold; 
+    }
+
+    input[type="text"]::placeholder,
+    input[type="tel"]::placeholder {
+        font-weight: bold;
+        color: #888; 
+    }
+
+    input[type="text"]:focus,
+    input[type="tel"]:focus {
+        border-color: #007bff; 
+        outline: none;
+    }
+
+    .enter-button {
+        background-color: #007bff; 
+        color: white;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.2em;
+        cursor: pointer;
+        margin-top: 20px;
+        width: 60%; 
+        font-weight: bold;
+    }
+
+    .enter-button:hover {
+        background-color: #0056b3;
+    }
+
+    .admin-section {
+        margin-top: 30px;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        border: 1px solid #dee2e6;
+    }
+</style>
+
+<div class="form-container">
+    <div class="company-header">
+        <img src="images/winstonLogo.png" alt="Winston Logo" class="logo">
+        <p class="tagline">Winston Check-In</p>
     </div>
-}
-else
+
+    <form @onsubmit="HandleCheckIn">
+        <div class="input-group">
+            <input type="text" @bind="firstName" placeholder="NAME" />
+        </div>
+
+        <div class="input-group">
+            <input type="text" @bind="lastName" placeholder="LAST NAME" />
+        </div>
+
+        <div class="input-group">
+            <input type="tel" @bind="phoneNumber" placeholder="PHONE #" />
+        </div>
+
+        <button type="submit" class="enter-button">ENTER</button>
+    </form>
+
+    @if (checkInMessage != null)
+    {
+        <p style="color: green; margin-top: 15px;">@checkInMessage</p>
+    }
+</div>
+
+@if (CheckInService.CheckInRecords.Any())
 {
-    <div style="margin-top: 20px;">
+    <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Recent Check-Ins</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTable Items="@CheckInService.CheckInRecords" Hover="true" Striped="true" Dense="true">
+                    <HeaderContent>
+                        <MudTh>First Name</MudTh>
+                        <MudTh>Last Name</MudTh>
+                        <MudTh>Phone</MudTh>
+                        <MudTh>Paid</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="First Name">@context.FirstName</MudTd>
+                        <MudTd DataLabel="Last Name">@context.LastName</MudTd>
+                        <MudTd DataLabel="Phone">@context.Phone</MudTd>
+                        <MudTd DataLabel="Paid">
+                            <MudChip T="string" Color="@(context.IsPaid ? Color.Success : Color.Error)" 
+                                    Size="Size.Small" 
+                                    Variant="Variant.Filled">
+                                @(context.IsPaid ? "Yes" : "No")
+                            </MudChip>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudCardContent>
+        </MudCard>
+    </MudContainer>
+}
+
+<div class="admin-section">
         <h3>Admin Login</h3>
-        
-        @if (errorMessage != null)
+
+        @if (AuthStateService.IsAuthenticated)
         {
-            <p style="color: red;">@errorMessage</p>
+            <div style="margin-top: 20px;">
+                <h4>Welcome, @AuthStateService.CurrentUser!</h4>
+                <p>You are successfully logged in.</p>
+                <button @onclick="Logout" class="btn btn-secondary">Logout</button>
+            </div>
         }
-        
-        <div style="margin-bottom: 10px;">
-            <label>Username:</label>
-            <input @bind="username" style="margin-left: 10px;" />
-        </div>
-        <div style="margin-bottom: 10px;">
-            <label>Password:</label>
-            <input type="password" @bind="password" style="margin-left: 10px;" />
-        </div>
-        <button @onclick="HandleLogin" class="btn btn-primary">Login</button>
+        else
+        {
+            <div style="margin-top: 20px;">
+                @if (errorMessage != null)
+                {
+                    <p style="color: red;">@errorMessage</p>
+                }
+                
+                <div style="margin-bottom: 10px;">
+                    <label>Username:</label>
+                    <input @bind="username" style="margin-left: 10px;" />
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label>Password:</label>
+                    <input type="password" @bind="password" style="margin-left: 10px;" />
+                </div>
+                <button @onclick="HandleLogin" class="btn btn-primary">Login</button>
+            </div>
+        }
     </div>
-}
+</div>
 
 @code {
     private string username = string.Empty;
     private string password = string.Empty;
     private string? errorMessage;
+    
+    // Check-in form fields
+    private string firstName = string.Empty;
+    private string lastName = string.Empty;
+    private string phoneNumber = string.Empty;
+    private string? checkInMessage;
 
     protected override void OnInitialized()
     {
         AuthStateService.PropertyChanged += OnAuthStateChanged;
+        CheckInService.PropertyChanged += OnCheckInServiceChanged;
     }
 
     private void OnAuthStateChanged(object? sender, PropertyChangedEventArgs e)
     {
         InvokeAsync(StateHasChanged);
+    }
+
+    private void OnCheckInServiceChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleCheckIn()
+    {
+        if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(phoneNumber))
+        {
+            checkInMessage = "Please fill in all fields.";
+            return;
+        }
+
+        // Add the check-in record to the service
+        CheckInService.AddCheckIn(firstName, lastName, phoneNumber);
+        checkInMessage = $"Welcome, {firstName} {lastName}! Check-in successful.";
+        
+        // Clear the form
+        firstName = string.Empty;
+        lastName = string.Empty;
+        phoneNumber = string.Empty;
     }
 
     private void HandleLogin()
@@ -78,5 +256,6 @@ else
     public void Dispose()
     {
         AuthStateService.PropertyChanged -= OnAuthStateChanged;
+        CheckInService.PropertyChanged -= OnCheckInServiceChanged;
     }
 }
