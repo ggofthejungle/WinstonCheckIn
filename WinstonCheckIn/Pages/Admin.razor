@@ -10,9 +10,28 @@
 
 <PageTitle>Admin</PageTitle>
 
-<h1>Admin Dashboard</h1>
+@if (!AuthStateService.IsAuthenticated)
+{
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8">
+        <MudCard>
+            <MudCardContent>
+                <MudText Typo="Typo.h4" Class="mb-4">Access Denied</MudText>
+                <MudText Class="mb-4">You must be logged in as an administrator to access this page.</MudText>
+                <MudButton Variant="Variant.Filled" 
+                          Color="Color.Primary" 
+                          StartIcon="Icons.Material.Filled.Login"
+                          @onclick="@(() => Navigation.NavigateTo("/"))">
+                    Go to Login
+                </MudButton>
+            </MudCardContent>
+        </MudCard>
+    </MudContainer>
+}
+else
+{
+    <h1>Admin Dashboard</h1>
 
-<p>Welcome to the admin panel. You have successfully logged in!</p>
+    <p>Welcome to the admin panel, @AuthStateService.CurrentUser! You have successfully logged in.</p>
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
     <MudCard>
@@ -53,7 +72,7 @@
                                   Color="Color.Error" 
                                   Size="Size.Small"
                                   StartIcon="Icons.Material.Filled.Delete"
-                                  @onclick="@(() => DeleteRecord(CheckInService.CheckInRecords.ToList().IndexOf(context)))">
+                                  @onclick="@(async () => await DeleteRecord(CheckInService.CheckInRecords.ToList().IndexOf(context)))">
                             Delete
                         </MudButton>
                     </MudTd>
@@ -63,13 +82,31 @@
     </MudCard>
 </MudContainer>
 
+<div class="mt-4">
+    <MudButton Variant="Variant.Filled" 
+              Color="Color.Secondary" 
+              StartIcon="Icons.Material.Filled.Logout"
+              @onclick="Logout">
+        Logout
+    </MudButton>
+</div>
+}
+
 @code {
+    [Inject] IDialogService DialogService { get; set; } = default!;
+
     protected override void OnInitialized()
     {
         CheckInService.PropertyChanged += OnCheckInServiceChanged;
+        AuthStateService.PropertyChanged += OnAuthStateChanged;
     }
 
     private void OnCheckInServiceChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnAuthStateChanged(object? sender, PropertyChangedEventArgs e)
     {
         InvokeAsync(StateHasChanged);
     }
@@ -80,13 +117,41 @@
         CheckInService.UpdatePaymentStatus(index, !record.IsPaid);
     }
 
-    private void DeleteRecord(int index)
+    private async Task DeleteRecord(int index)
     {
-        CheckInService.RemoveCheckIn(index);
+        var record = CheckInService.CheckInRecords[index];
+        var parameters = new DialogParameters<MudMessageBox>
+        {
+            { x => x.Title, "Confirm Delete" },
+            { x => x.Message, $"Are you sure you want to delete the record for {record.FirstName} {record.LastName}? This action cannot be undone." },
+            { x => x.YesText, "Delete" },
+            { x => x.NoText, "Cancel" }
+        };
+
+        var options = new DialogOptions() 
+        { 
+            CloseButton = true, 
+            MaxWidth = MaxWidth.Small 
+        };
+
+        var dialog = await DialogService.ShowAsync<MudMessageBox>("Delete Record", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            CheckInService.RemoveCheckIn(index);
+        }
+    }
+
+    private void Logout()
+    {
+        AuthStateService.Logout();
+        Navigation.NavigateTo("/");
     }
 
     public void Dispose()
     {
         CheckInService.PropertyChanged -= OnCheckInServiceChanged;
+        AuthStateService.PropertyChanged -= OnAuthStateChanged;
     }
 }
