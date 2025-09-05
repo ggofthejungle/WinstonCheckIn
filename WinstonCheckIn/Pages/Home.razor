@@ -2,10 +2,8 @@
 @using System.ComponentModel
 @using MudBlazor
 @page "/"
-@inject NavigationManager Navigation
-@inject LoginService LoginService
-@inject AuthenticationStateService AuthStateService
 @inject CheckInService CheckInService
+@inject ISnackbar Snackbar
 @implements IDisposable
 
 <PageTitle>Home</PageTitle>
@@ -92,108 +90,83 @@
         border-radius: 5px;
         border: 1px solid #dee2e6;
     }
+
+    .count-indicator {
+        font-size: 14px;
+        color: #666;
+        margin-top: 5px;
+        font-weight: 500;
+    }
 </style>
 
 <div class="form-container">
     <div class="company-header">
         <img src="images/winstonLogo.png" alt="Winston Logo" class="logo">
         <p class="tagline">Winston Check-In</p>
+        <p class="count-indicator">@CheckInService.CheckInRecords.Count / 28 spots filled</p>
     </div>
 
-    <form @onsubmit="HandleCheckIn">
-        <div class="input-group">
-            <input type="text" @bind="firstName" placeholder="NAME" />
-        </div>
-
-        <div class="input-group">
-            <input type="text" @bind="lastName" placeholder="LAST NAME" />
-        </div>
-
-        <div class="input-group">
-            <input type="tel" @bind="phoneNumber" placeholder="PHONE #" />
-        </div>
-
-        <button type="submit" class="enter-button">ENTER</button>
-    </form>
-
-    @if (checkInMessage != null)
+    @if (CheckInService.CheckInRecords.Count < 28)
     {
-        <p style="color: green; margin-top: 15px;">@checkInMessage</p>
+        <form @onsubmit="HandleCheckIn">
+            <div class="input-group">
+                <input type="text" @bind="firstName" placeholder="NAME" />
+            </div>
+
+            <div class="input-group">
+                <input type="text" @bind="lastName" placeholder="LAST NAME" />
+            </div>
+
+            <div class="input-group">
+                <input type="tel" @bind="phoneNumber" placeholder="PHONE #" />
+            </div>
+
+            <button type="submit" class="enter-button">ENTER</button>
+        </form>
+
+        @if (checkInMessage != null)
+        {
+            <p style="color: green; margin-top: 15px;">@checkInMessage</p>
+        }
+    }
+    else
+    {
+        <div class="mt-4">
+            <MudAlert Severity="Severity.Warning" Class="mb-4">
+                <MudText Typo="Typo.h6" Class="mb-2">Sorry, 28 people have already checked in!</MudText>
+                <MudText>All available spots have been filled. Thank you for your interest!</MudText>
+            </MudAlert>
+        </div>
     }
 </div>
 
 @if (CheckInService.CheckInRecords.Any())
 {
-    <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
-        <MudCard>
-            <MudCardHeader>
-                <CardHeaderContent>
-                    <MudText Typo="Typo.h6">Recent Check-Ins</MudText>
-                </CardHeaderContent>
-            </MudCardHeader>
-            <MudCardContent>
-                <MudTable Items="@CheckInService.CheckInRecords" Hover="true" Striped="true" Dense="true">
-                    <HeaderContent>
-                        <MudTh>First Name</MudTh>
-                        <MudTh>Last Name</MudTh>
-                        <MudTh>Phone</MudTh>
-                        <MudTh>Paid</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="First Name">@context.FirstName</MudTd>
-                        <MudTd DataLabel="Last Name">@context.LastName</MudTd>
-                        <MudTd DataLabel="Phone">@context.Phone</MudTd>
-                        <MudTd DataLabel="Paid">
-                            <MudChip T="string" Color="@(context.IsPaid ? Color.Success : Color.Error)" 
-                                    Size="Size.Small" 
-                                    Variant="Variant.Filled">
-                                @(context.IsPaid ? "Yes" : "No")
-                            </MudChip>
-                        </MudTd>
-                    </RowTemplate>
-                </MudTable>
-            </MudCardContent>
-        </MudCard>
-    </MudContainer>
+    <div class="mt-4">
+        @foreach (var record in CheckInService.CheckInRecords)
+        {
+            <div class="d-flex align-items-center py-1 px-0" style="border-bottom: 1px solid #e0e0e0;">
+                <div class="flex-grow-1 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <span style="font-size: 14px;">
+                            <strong>@record.FirstName @record.LastName</strong> - @record.Phone
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <MudChip T="string" Color="@(record.IsPaid ? Color.Success : Color.Error)" 
+                                Size="Size.Small" 
+                                Variant="Variant.Filled">
+                            @(record.IsPaid ? "Paid" : "Unpaid")
+                        </MudChip>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 }
 
-<div class="admin-section">
-    <h3>Admin Login</h3>
-
-    @if (AuthStateService.IsAuthenticated)
-    {
-        <div style="margin-top: 20px;">
-            <h4>Welcome, @AuthStateService.CurrentUser!</h4>
-            <p>You are successfully logged in.</p>
-            <button @onclick="Logout" class="btn btn-secondary">Logout</button>
-        </div>
-    }
-    else
-    {
-        <div style="margin-top: 20px;">
-            @if (errorMessage != null)
-            {
-                <p style="color: red;">@errorMessage</p>
-            }
-            
-            <div style="margin-bottom: 10px;">
-                <label>Username:</label>
-                <input @bind="username" style="margin-left: 10px;" />
-            </div>
-            <div style="margin-bottom: 10px;">
-                <label>Password:</label>
-                <input type="password" @bind="password" style="margin-left: 10px;" />
-            </div>
-            <button @onclick="HandleLogin" class="btn btn-primary">Login</button>
-        </div>
-    }
-</div>
 
 @code {
-    private string username = string.Empty;
-    private string password = string.Empty;
-    private string? errorMessage;
-    
     // Check-in form fields
     private string firstName = string.Empty;
     private string lastName = string.Empty;
@@ -202,13 +175,7 @@
 
     protected override void OnInitialized()
     {
-        AuthStateService.PropertyChanged += OnAuthStateChanged;
         CheckInService.PropertyChanged += OnCheckInServiceChanged;
-    }
-
-    private void OnAuthStateChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        InvokeAsync(StateHasChanged);
     }
 
     private void OnCheckInServiceChanged(object? sender, PropertyChangedEventArgs e)
@@ -218,15 +185,41 @@
 
     private void HandleCheckIn()
     {
+        // Check if we've reached the 28 person limit
+        if (CheckInService.CheckInRecords.Count >= 28)
+        {
+            checkInMessage = "Sorry, 28 people have already checked in!";
+            return;
+        }
+
         if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(phoneNumber))
         {
             checkInMessage = "Please fill in all fields.";
             return;
         }
 
+        // Check if this will be the 28th person (before adding)
+        bool isLastPerson = CheckInService.CheckInRecords.Count == 27;
+
         // Add the check-in record to the service
         CheckInService.AddCheckIn(firstName, lastName, phoneNumber);
-        checkInMessage = $"Welcome, {firstName} {lastName}! Check-in successful.";
+        
+        if (isLastPerson)
+        {
+            // Special message for the 28th person
+            checkInMessage = "Sorry, 28 people have already checked in!";
+            Snackbar.Add($"🎉 Congratulations {firstName} {lastName}! You are the last one checked in, lucky you! 🍀", Severity.Success, config =>
+            {
+                config.VisibleStateDuration = 5000; // Show for 5 seconds
+                config.HideTransitionDuration = 500;
+                config.ShowTransitionDuration = 500;
+                config.SnackbarVariant = Variant.Filled;
+            });
+        }
+        else
+        {
+            checkInMessage = $"Welcome, {firstName} {lastName}! Check-in successful.";
+        }
         
         // Clear the form
         firstName = string.Empty;
@@ -234,27 +227,8 @@
         phoneNumber = string.Empty;
     }
 
-    private void HandleLogin()
-    {
-        if (LoginService.Authenticate(username, password))
-        {
-            Navigation.NavigateTo("/admin");
-        }
-        else
-        {
-            errorMessage = "Invalid username or password.";
-        }
-    }
-
-    private void Logout()
-    {
-        AuthStateService.Logout();
-        Navigation.NavigateTo("/");
-    }
-
     public void Dispose()
     {
-        AuthStateService.PropertyChanged -= OnAuthStateChanged;
         CheckInService.PropertyChanged -= OnCheckInServiceChanged;
     }
 }

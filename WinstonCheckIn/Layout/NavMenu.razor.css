@@ -34,8 +34,8 @@
 }
 
 .nav-item {
-    font-size: 0.9rem;
-    padding-bottom: 0.5rem;
+    font-size: 0.85rem;
+    padding-bottom: 0.3rem;
 }
 
     .nav-item:first-of-type {
@@ -49,10 +49,10 @@
     .nav-item ::deep a {
         color: #d7d7d7;
         border-radius: 4px;
-        height: 3rem;
+        height: 2.5rem;
         display: flex;
         align-items: center;
-        line-height: 3rem;
+        line-height: 2.5rem;
     }
 
 .nav-item ::deep a.active {
