@@ -1,0 +1,207 @@
+@using WinstonCheckIn.Services
+@using MudBlazor
+@using System.ComponentModel
+@page "/data-utility"
+@inject CheckInService CheckInService
+@inject IDialogService DialogService
+@implements IDisposable
+
+<PageTitle>Data Utility</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+    <MudCard>
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h4">Data Population Utility</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudText Class="mb-4">
+                Current records: <MudChip T="int" Color="Color.Primary" Size="Size.Small">@CheckInService.CheckInRecords.Count</MudChip>
+            </MudText>
+            
+            <MudText Class="mb-4">
+                This utility will populate the system with sample check-in records for testing purposes.
+            </MudText>
+
+            <MudButton Variant="Variant.Filled" 
+                      Color="Color.Primary" 
+                      StartIcon="Icons.Material.Filled.Add"
+                      @onclick="PopulateSampleData"
+                      Disabled="@isLoading"
+                      Class="mb-2">
+                @if (isLoading)
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                }
+                Populate with 28 Sample Records
+            </MudButton>
+
+            <MudButton Variant="Variant.Filled" 
+                      Color="Color.Error" 
+                      StartIcon="Icons.Material.Filled.Clear"
+                      @onclick="ClearAllData"
+                      Disabled="@isLoading"
+                      Class="ml-2">
+                Clear All Data
+            </MudButton>
+
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <MudAlert Severity="@alertSeverity" Class="mt-4">@message</MudAlert>
+            }
+        </MudCardContent>
+    </MudCard>
+
+    @if (CheckInService.CheckInRecords.Any())
+    {
+        <div class="mt-4">
+            <MudText Typo="Typo.h6" Class="mb-2">Current Records (@CheckInService.CheckInRecords.Count)</MudText>
+            @foreach (var record in CheckInService.CheckInRecords)
+            {
+                <div class="d-flex align-items-center py-1 px-0" style="border-bottom: 1px solid #e0e0e0;">
+                    <div class="flex-grow-1 d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <span style="font-size: 14px;">
+                                <strong>@record.FirstName @record.LastName</strong> - @record.Phone
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <MudChip T="string" Color="@(record.IsPaid ? Color.Success : Color.Error)" 
+                                    Size="Size.Small" 
+                                    Variant="Variant.Filled">
+                                @(record.IsPaid ? "Paid" : "Unpaid")
+                            </MudChip>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</MudContainer>
+
+@code {
+    private bool isLoading = false;
+    private string message = string.Empty;
+    private Severity alertSeverity = Severity.Info;
+
+    private readonly string[] firstNames = {
+        "John", "Jane", "Mike", "Sarah", "David", "Lisa", "Tom", "Amy", "Chris", "Emma",
+        "Alex", "Maria", "James", "Anna", "Robert", "Jessica", "Michael", "Jennifer", "William", "Ashley",
+        "Daniel", "Emily", "Matthew", "Elizabeth", "Anthony", "Samantha", "Mark", "Michelle"
+    };
+
+    private readonly string[] lastNames = {
+        "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez",
+        "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin",
+        "Lee", "Perez", "Thompson", "White", "Harris", "Sanchez", "Clark", "Ramirez"
+    };
+
+    protected override void OnInitialized()
+    {
+        CheckInService.PropertyChanged += OnCheckInServiceChanged;
+    }
+
+    private void OnCheckInServiceChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task PopulateSampleData()
+    {
+        isLoading = true;
+        message = string.Empty;
+        StateHasChanged();
+
+        try
+        {
+            var random = new Random();
+            var recordsToAdd = 28 - CheckInService.CheckInRecords.Count;
+
+            if (recordsToAdd <= 0)
+            {
+                message = "System already has 28 or more records!";
+                alertSeverity = Severity.Warning;
+                return;
+            }
+
+            for (int i = 0; i < recordsToAdd; i++)
+            {
+                var firstName = firstNames[random.Next(firstNames.Length)];
+                var lastName = lastNames[random.Next(lastNames.Length)];
+                var phone = GeneratePhoneNumber(random);
+                var isPaid = random.Next(2) == 1; // 50% chance of being paid
+
+                CheckInService.AddCheckIn(firstName, lastName, phone);
+                
+                // Set payment status if paid
+                if (isPaid)
+                {
+                    var index = CheckInService.CheckInRecords.Count - 1;
+                    CheckInService.UpdatePaymentStatus(index, true);
+                }
+
+                // Small delay to show progress
+                await Task.Delay(50);
+            }
+
+            message = $"Successfully added {recordsToAdd} sample records!";
+            alertSeverity = Severity.Success;
+        }
+        catch (Exception ex)
+        {
+            message = $"Error adding sample data: {ex.Message}";
+            alertSeverity = Severity.Error;
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ClearAllData()
+    {
+        var parameters = new DialogParameters<MudMessageBox>
+        {
+            { x => x.Title, "Confirm Clear All Data" },
+            { x => x.Message, "Are you sure you want to clear all check-in records? This action cannot be undone." },
+            { x => x.YesText, "Clear All" },
+            { x => x.NoText, "Cancel" }
+        };
+
+        var options = new DialogOptions() 
+        { 
+            CloseButton = true, 
+            MaxWidth = MaxWidth.Small 
+        };
+
+        var dialog = await DialogService.ShowAsync<MudMessageBox>("Clear All Data", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            // Clear all records by removing them one by one
+            while (CheckInService.CheckInRecords.Count > 0)
+            {
+                CheckInService.RemoveCheckIn(0);
+            }
+
+            message = "All data has been cleared!";
+            alertSeverity = Severity.Info;
+        }
+    }
+
+    private string GeneratePhoneNumber(Random random)
+    {
+        var areaCode = random.Next(200, 999);
+        var exchange = random.Next(200, 999);
+        var number = random.Next(1000, 9999);
+        return $"({areaCode}) {exchange}-{number}";
+    }
+
+    public void Dispose()
+    {
+        CheckInService.PropertyChanged -= OnCheckInServiceChanged;
+    }
+}

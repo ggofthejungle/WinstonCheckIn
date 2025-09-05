@@ -1,9 +1,11 @@
 ﻿@using WinstonCheckIn.Services
 @using System.ComponentModel
 @using MudBlazor
+@using Microsoft.JSInterop
 @page "/"
 @inject CheckInService CheckInService
 @inject ISnackbar Snackbar
+@inject IJSRuntime JSRuntime
 @implements IDisposable
 
 <PageTitle>Home</PageTitle>
@@ -11,11 +13,11 @@
 <style>
     .form-container {
         background-color: #ffffff; 
-        padding: 40px;
+        padding: 1px;
         border-radius: 5px; 
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); 
-        width: 350px; 
-        max-width: 90%; 
+        width: 100%;
+        max-width: 800px; 
         text-align: center;
         margin: 20px auto;
     }
@@ -52,7 +54,28 @@
         text-align: center;
         box-sizing: border-box; 
         font-weight: bold; 
+        transition: border-color 0.3s ease, background-color 0.3s ease;
     }
+
+    input[type="text"].input-error,
+    input[type="tel"].input-error {
+        border-color: #dc3545;
+        background-color: #fff5f5;
+    }
+
+    .error-message {
+        color: #dc3545;
+        font-size: 12px;
+        margin-top: 4px;
+        text-align: left;
+        font-weight: normal;
+    }
+
+    .check-in-success {
+        text-align: center;
+        margin: 20px 0;
+    }
+
 
     input[type="text"]::placeholder,
     input[type="tel"]::placeholder {
@@ -97,6 +120,70 @@
         margin-top: 5px;
         font-weight: 500;
     }
+
+    .waiver-section {
+        margin: 20px 0;
+    }
+
+    .waiver-card {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    .waiver-card-content {
+        padding: 15px !important;
+    }
+
+    .waiver-text {
+        font-size: 14px;
+        line-height: 1.5;
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 15px 20px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+        text-align: left;
+    }
+
+    .signature-section {
+        margin-top: 15px;
+    }
+
+    .signature-container {
+        display: flex;
+        justify-content: center;
+        margin: 10px 0;
+    }
+
+    #signatureCanvas {
+        cursor: crosshair;
+        touch-action: none;
+    }
+
+    .signature-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    @@media (max-width: 768px) {
+        .form-container {
+            max-width: 95%;
+            padding: 20px;
+        }
+        
+        .waiver-text {
+            font-size: 13px;
+            padding: 12px 15px;
+        }
+        
+        #signatureCanvas {
+            width: 100% !important;
+            max-width: 350px;
+            height: 120px !important;
+        }
+    }
 </style>
 
 <div class="form-container">
@@ -106,22 +193,105 @@
         <p class="count-indicator">@CheckInService.CheckInRecords.Count / 28 spots filled</p>
     </div>
 
-    @if (CheckInService.CheckInRecords.Count < 28)
+    @if (hasCheckedIn)
     {
-        <form @onsubmit="HandleCheckIn">
+        <div class="check-in-success">
+            <MudAlert Severity="Severity.Success" Class="mb-4">
+                <MudText Typo="Typo.h6" Class="mb-2">Check-In Complete!</MudText>
+                <MudText>Thank you for checking in. You have successfully completed the registration process.</MudText>
+            </MudAlert>
+        </div>
+    }
+    else if (CheckInService.CheckInRecords.Count < 28)
+    {
+        <form @onsubmit="HandleCheckIn" @onsubmit:preventDefault="true">
             <div class="input-group">
-                <input type="text" @bind="firstName" placeholder="NAME" />
+                <input type="text" @bind="firstName" @bind:event="oninput" @onblur="ValidateFirstName" placeholder="NAME" class="@(string.IsNullOrEmpty(firstNameError) ? "" : "input-error")" />
+                @if (!string.IsNullOrEmpty(firstNameError))
+                {
+                    <div class="error-message">@firstNameError</div>
+                }
             </div>
 
             <div class="input-group">
-                <input type="text" @bind="lastName" placeholder="LAST NAME" />
+                <input type="text" @bind="lastName" @bind:event="oninput" @onblur="ValidateLastName" placeholder="LAST NAME" class="@(string.IsNullOrEmpty(lastNameError) ? "" : "input-error")" />
+                @if (!string.IsNullOrEmpty(lastNameError))
+                {
+                    <div class="error-message">@lastNameError</div>
+                }
             </div>
 
             <div class="input-group">
-                <input type="tel" @bind="phoneNumber" placeholder="PHONE #" />
+                <input type="tel" @bind="phoneNumber" @bind:event="oninput" @onblur="ValidatePhone" placeholder="PHONE #" class="@(string.IsNullOrEmpty(phoneError) ? "" : "input-error")" />
+                @if (!string.IsNullOrEmpty(phoneError))
+                {
+                    <div class="error-message">@phoneError</div>
+                }
             </div>
 
-            <button type="submit" class="enter-button">ENTER</button>
+            <!-- Waiver Agreement Section -->
+            <div class="waiver-section">
+                <MudCard Class="waiver-card">
+                    <MudCardContent Class="waiver-card-content">
+                        <MudText Typo="Typo.h6" Class="mb-3">Waiver & Release Agreement</MudText>
+                        <div class="waiver-text">
+                            <MudText Typo="Typo.body2" Class="mb-3">
+                                <strong>SALT CREEK RURAL PARK DISTRICT'S WAIVER & RELEASE OF ALL CLAIMS</strong>
+                            </MudText>
+                            <MudText Typo="Typo.body2" Class="mb-2">
+                                Please read this form carefully and be aware that in registering yourself or your minor child/ward for participation in Salt Creek Rural Park District's programs you will be waiving any and all claims for injuries you or your child ward might sustain.
+                            </MudText>
+                            <MudText Typo="Typo.body2" Class="mb-2">
+                                I acknowledge that there are certain risks of physical injury to participants in the Salt Creek Park District's programs, and I agree to assume the full risk of any such injuries, damages or loss regardless of severity which I or my child ward may sustain as a result of participating in any activities connected or associated with any such programs.
+                            </MudText>
+                            <MudText Typo="Typo.body2" Class="mb-2">
+                                I hereby fully release and discharge the Park District, its officers, agents, servants and employees from any and all claims from injuries, damage or loss which may occur due to the participation of myself or my child ward in any Salt Creek Rural Park District programs.
+                            </MudText>
+                            <MudText Typo="Typo.body2" Class="mb-2">
+                                I further agree to defend, indemnify and hold harmless the Park District its officers, agents, servants and employees from any and all claims resulting from injuries, damages and losses sustained or arising out of, connected with or in any way associated with the activities of any programs that myself or my child/ward participated in.
+                            </MudText>
+                            <MudText Typo="Typo.body2" Class="mb-2">
+                                I also understand that photographs and videos are periodically taken of participants while they are engaged in programs, special events and park activities. I give my permission to Salt Creek Park District to use these photos in future publications.
+                            </MudText>
+                            <MudText Typo="Typo.body2" Class="mb-3">
+                                <strong>THE SALT CREEK RURAL PARK DISTRICT HAS MY PERMISSION TO OBTAIN EMERGENCY MEDICAL ATTENTION WHEN REQUIRED. I HAVE READ AND FULLY UNDERSTAND THE ABOVE DETAILS AND WAIVER, I RELEASE ALL CLAIMS.</strong>
+                            </MudText>
+                        </div>
+                        
+                        <MudCheckBox @bind-Value="waiverAccepted" Label="I have read and agree to the above waiver and release of all claims" Class="mb-3" />
+                        
+                        @if (waiverAccepted)
+                        {
+                            <div class="signature-section">
+                                <MudText Typo="Typo.subtitle2" Class="mb-2">Please sign below:</MudText>
+                                <div class="signature-container">
+                                    <canvas id="signatureCanvas" width="400" height="150" style="border: 1px solid #ccc; border-radius: 4px; background: white; cursor: crosshair;" 
+                                            @onmousedown="StartDrawing" @onmousemove="Draw" @onmouseup="StopDrawing" 
+                                            @ontouchstart="StartDrawing" @ontouchmove="Draw" @ontouchend="StopDrawing"></canvas>
+                                </div>
+                                <div class="signature-buttons mt-2">
+                                    <MudButton Variant="Variant.Text" Color="Color.Secondary" Size="Size.Small" @onclick="ClearSignature">
+                                        Clear Signature
+                                    </MudButton>
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" Size="Size.Small" @onclick="TestSignature">
+                                        Test Signature
+                                    </MudButton>
+                                </div>
+                                @if (hasSignature)
+                                {
+                                    <MudText Typo="Typo.caption" Color="Color.Success" Class="mt-1">✓ Signature captured</MudText>
+                                }
+                                else
+                                {
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mt-1">Please sign above</MudText>
+                                }
+                            </div>
+                        }
+                    </MudCardContent>
+                </MudCard>
+            </div>
+
+            <button type="button" class="enter-button" disabled="@(!IsFormValid())" @onclick="HandleCheckIn">ENTER</button>
         </form>
 
         @if (checkInMessage != null)
@@ -172,10 +342,35 @@
     private string lastName = string.Empty;
     private string phoneNumber = string.Empty;
     private string? checkInMessage;
+    
+    // Validation properties
+    private string firstNameError = string.Empty;
+    private string lastNameError = string.Empty;
+    private string phoneError = string.Empty;
+    
+    // Check-in state
+    private bool hasCheckedIn = false;
+    private bool waiverAccepted = false;
+    private bool hasSignature = false;
+    private IJSObjectReference? signaturePad;
+    private IJSObjectReference? module;
+    private Timer? signatureCheckTimer;
+    private bool isDrawing = false;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         CheckInService.PropertyChanged += OnCheckInServiceChanged;
+        module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/signature.js");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Add delay to ensure DOM is fully rendered
+            await Task.Delay(500);
+            await InitializeSignaturePad();
+        }
     }
 
     private void OnCheckInServiceChanged(object? sender, PropertyChangedEventArgs e)
@@ -183,31 +378,239 @@
         InvokeAsync(StateHasChanged);
     }
 
-    private void HandleCheckIn()
+    private async Task InitializeSignaturePad()
     {
+        try
+        {
+            if (module != null)
+            {
+                signaturePad = await module.InvokeAsync<IJSObjectReference>("initializeSignaturePad", "signatureCanvas");
+                Console.WriteLine("Signature pad initialized successfully");
+                
+                // Start a timer to periodically check for signature changes
+                signatureCheckTimer = new Timer(async _ => await CheckSignatureStatus(), null, 1000, 500);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error initializing signature pad: {ex.Message}");
+        }
+    }
+
+    private async Task ClearSignature()
+    {
+        await JSRuntime.InvokeVoidAsync("clearCanvas", "signatureCanvas");
+        hasSignature = false;
+        StateHasChanged();
+    }
+
+    private async Task<string?> GetSignatureData()
+    {
+        var isEmpty = await JSRuntime.InvokeAsync<bool>("isCanvasEmpty", "signatureCanvas");
+        if (isEmpty)
+        {
+            return null;
+        }
+        return await JSRuntime.InvokeAsync<string>("getCanvasData", "signatureCanvas");
+    }
+
+    private async Task CheckSignatureStatus()
+    {
+        var newHasSignature = !await JSRuntime.InvokeAsync<bool>("isCanvasEmpty", "signatureCanvas");
+        if (newHasSignature != hasSignature)
+        {
+            hasSignature = newHasSignature;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task OnSignatureChanged()
+    {
+        await Task.Delay(100); // Small delay to ensure signature is captured
+        await CheckSignatureStatus();
+        StateHasChanged();
+    }
+
+    private async Task TestSignature()
+    {
+        Console.WriteLine("Testing signature...");
+        if (signaturePad != null)
+        {
+            var isEmpty = await signaturePad.InvokeAsync<bool>("isEmpty");
+            var hasSig = await signaturePad.InvokeAsync<bool>("hasSignature");
+            Console.WriteLine($"Signature test - isEmpty: {isEmpty}, hasSignature: {hasSig}");
+            
+            await CheckSignatureStatus();
+            StateHasChanged();
+        }
+        else
+        {
+            Console.WriteLine("Signature pad is null");
+        }
+    }
+
+    private async Task StartDrawing(MouseEventArgs e)
+    {
+        isDrawing = true;
+        await JSRuntime.InvokeVoidAsync("startDrawing", "signatureCanvas", e.ClientX, e.ClientY);
+    }
+
+    private async Task Draw(MouseEventArgs e)
+    {
+        if (isDrawing)
+        {
+            await JSRuntime.InvokeVoidAsync("draw", "signatureCanvas", e.ClientX, e.ClientY);
+        }
+    }
+
+    private async Task StopDrawing(MouseEventArgs e)
+    {
+        if (isDrawing)
+        {
+            isDrawing = false;
+            await JSRuntime.InvokeVoidAsync("stopDrawing", "signatureCanvas");
+            hasSignature = true;
+            StateHasChanged();
+        }
+    }
+
+    private async Task StartDrawing(TouchEventArgs e)
+    {
+        if (e.Touches.Length > 0)
+        {
+            isDrawing = true;
+            var touch = e.Touches[0];
+            await JSRuntime.InvokeVoidAsync("startDrawing", "signatureCanvas", touch.ClientX, touch.ClientY);
+        }
+    }
+
+    private async Task Draw(TouchEventArgs e)
+    {
+        if (isDrawing && e.Touches.Length > 0)
+        {
+            var touch = e.Touches[0];
+            await JSRuntime.InvokeVoidAsync("draw", "signatureCanvas", touch.ClientX, touch.ClientY);
+        }
+    }
+
+    private async Task StopDrawing(TouchEventArgs e)
+    {
+        if (isDrawing)
+        {
+            isDrawing = false;
+            await JSRuntime.InvokeVoidAsync("stopDrawing", "signatureCanvas");
+            hasSignature = true;
+            StateHasChanged();
+        }
+    }
+
+    public bool HasSignature => hasSignature;
+
+    private void ValidateFirstName()
+    {
+        if (string.IsNullOrWhiteSpace(firstName))
+        {
+            firstNameError = "First name is required";
+        }
+        else if (!System.Text.RegularExpressions.Regex.IsMatch(firstName, @"^[a-zA-Z\s]+$"))
+        {
+            firstNameError = "First name can only contain letters and spaces";
+        }
+        else
+        {
+            firstNameError = string.Empty;
+        }
+    }
+
+    private void ValidateLastName()
+    {
+        if (string.IsNullOrWhiteSpace(lastName))
+        {
+            lastNameError = "Last name is required";
+        }
+        else if (!System.Text.RegularExpressions.Regex.IsMatch(lastName, @"^[a-zA-Z\s]+$"))
+        {
+            lastNameError = "Last name can only contain letters and spaces";
+        }
+        else
+        {
+            lastNameError = string.Empty;
+        }
+    }
+
+    private void ValidatePhone()
+    {
+        if (string.IsNullOrWhiteSpace(phoneNumber))
+        {
+            phoneError = "Phone number is required";
+        }
+        else if (!System.Text.RegularExpressions.Regex.IsMatch(phoneNumber, @"^[\+]?[0-9\s\-\(\)]+$"))
+        {
+            phoneError = "Phone number can only contain numbers, spaces, hyphens, parentheses, and plus sign";
+        }
+        else
+        {
+            phoneError = string.Empty;
+        }
+    }
+
+    private bool IsFormValid()
+    {
+        return string.IsNullOrEmpty(firstNameError) && 
+               string.IsNullOrEmpty(lastNameError) && 
+               string.IsNullOrEmpty(phoneError) &&
+               waiverAccepted && 
+               hasSignature;
+    }
+
+
+    private async Task HandleCheckIn()
+    {
+        Console.WriteLine("HandleCheckIn called");
+        
+        // Validate all fields before proceeding
+        ValidateFirstName();
+        ValidateLastName();
+        ValidatePhone();
+        
+        if (!IsFormValid())
+        {
+            checkInMessage = "Please fix the errors above before continuing.";
+            StateHasChanged();
+            return;
+        }
+        
         // Check if we've reached the 28 person limit
         if (CheckInService.CheckInRecords.Count >= 28)
         {
             checkInMessage = "Sorry, 28 people have already checked in!";
+            StateHasChanged();
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(phoneNumber))
+        // Get signature data
+        var signatureData = await GetSignatureData();
+        if (string.IsNullOrEmpty(signatureData))
         {
-            checkInMessage = "Please fill in all fields.";
+            checkInMessage = "Please provide your signature to continue.";
+            StateHasChanged();
             return;
         }
+
+        Console.WriteLine($"Check-in data: {firstName} {lastName}, {phoneNumber}, waiver: {waiverAccepted}, hasSignature: {hasSignature}");
 
         // Check if this will be the 28th person (before adding)
         bool isLastPerson = CheckInService.CheckInRecords.Count == 27;
 
-        // Add the check-in record to the service
-        CheckInService.AddCheckIn(firstName, lastName, phoneNumber);
+        // Add the check-in record to the service with waiver and signature
+        CheckInService.AddCheckIn(firstName, lastName, phoneNumber, true, signatureData);
+        
+        // Mark as checked in to hide the form
+        hasCheckedIn = true;
         
         if (isLastPerson)
         {
             // Special message for the 28th person
-            checkInMessage = "Sorry, 28 people have already checked in!";
             Snackbar.Add($"🎉 Congratulations {firstName} {lastName}! You are the last one checked in, lucky you! 🍀", Severity.Success, config =>
             {
                 config.VisibleStateDuration = 5000; // Show for 5 seconds
@@ -216,19 +619,13 @@
                 config.SnackbarVariant = Variant.Filled;
             });
         }
-        else
-        {
-            checkInMessage = $"Welcome, {firstName} {lastName}! Check-in successful.";
-        }
         
-        // Clear the form
-        firstName = string.Empty;
-        lastName = string.Empty;
-        phoneNumber = string.Empty;
+        StateHasChanged();
     }
 
     public void Dispose()
     {
         CheckInService.PropertyChanged -= OnCheckInServiceChanged;
+        signatureCheckTimer?.Dispose();
     }
 }

@@ -46,37 +46,51 @@ else
 <div class="mt-4">
     @foreach (var record in CheckInService.CheckInRecords)
     {
-        <div class="d-flex align-items-center py-1 px-0" style="border-bottom: 1px solid #e0e0e0;">
-            <div class="flex-grow-1 d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center">
-                    <span style="font-size: 14px;">
-                        <strong>@record.FirstName @record.LastName</strong> - @record.Phone
-                    </span>
-                    <MudChip T="string" Color="@(record.IsPaid ? Color.Success : Color.Error)" 
-                            Size="Size.Small" 
-                            Variant="Variant.Filled"
-                            Class="ms-2">
-                        @(record.IsPaid ? "Paid" : "Unpaid")
-                    </MudChip>
+                        <div class="d-flex align-items-center py-1 px-0" style="border-bottom: 1px solid #e0e0e0;">
+                    <div class="flex-grow-1 d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <span style="font-size: 14px;">
+                                <strong>@record.FirstName @record.LastName</strong> - @record.Phone
+                            </span>
+                            <MudChip T="string" Color="@(record.IsPaid ? Color.Success : Color.Error)" 
+                                    Size="Size.Small" 
+                                    Variant="Variant.Filled"
+                                    Class="ms-2">
+                                @(record.IsPaid ? "Paid" : "Unpaid")
+                            </MudChip>
+                            @if (!string.IsNullOrEmpty(record.SignatureData))
+                            {
+                                <MudButton Variant="Variant.Text" 
+                                          Color="Color.Info" 
+                                          Size="Size.Small"
+                                          StartIcon="Icons.Material.Filled.Signature"
+                                          @onclick="@(() => ShowSignature(record.SignatureData, $"{record.FirstName} {record.LastName}"))"
+                                          Class="ms-1">
+                                    Signature
+                                </MudButton>
+                            }
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <MudButton Variant="Variant.Text" 
+                                      Color="Color.Primary" 
+                                      Size="Size.Small"
+                                      StartIcon="Icons.Material.Filled.Edit"
+                                      @onclick="@(() => TogglePaymentStatus(CheckInService.CheckInRecords.ToList().IndexOf(record)))">
+                                Toggle
+                            </MudButton>
+                            @if (record.FirstName != "Organizer")
+                            {
+                                <MudButton Variant="Variant.Text" 
+                                          Color="Color.Error" 
+                                          Size="Size.Small"
+                                          StartIcon="Icons.Material.Filled.Delete"
+                                          @onclick="@(async () => await DeleteRecord(CheckInService.CheckInRecords.ToList().IndexOf(record)))">
+                                    Delete
+                                </MudButton>
+                            }
+                        </div>
+                    </div>
                 </div>
-                <div class="d-flex align-items-center">
-                    <MudButton Variant="Variant.Text" 
-                              Color="Color.Primary" 
-                              Size="Size.Small"
-                              StartIcon="Icons.Material.Filled.Edit"
-                              @onclick="@(() => TogglePaymentStatus(CheckInService.CheckInRecords.ToList().IndexOf(record)))">
-                        Toggle
-                    </MudButton>
-                    <MudButton Variant="Variant.Text" 
-                              Color="Color.Error" 
-                              Size="Size.Small"
-                              StartIcon="Icons.Material.Filled.Delete"
-                              @onclick="@(async () => await DeleteRecord(CheckInService.CheckInRecords.ToList().IndexOf(record)))">
-                        Delete
-                    </MudButton>
-                </div>
-            </div>
-        </div>
     }
 </div>
 
@@ -162,6 +176,24 @@ else
     {
         AuthStateService.Logout();
         Navigation.NavigateTo("/");
+    }
+
+    private async Task ShowSignature(string signatureData, string personName)
+    {
+        var parameters = new DialogParameters<SignatureDialog>
+        {
+            { x => x.SignatureData, signatureData },
+            { x => x.PersonName, personName }
+        };
+
+        var options = new DialogOptions() 
+        { 
+            CloseButton = true, 
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        };
+
+        await DialogService.ShowAsync<SignatureDialog>($"Signature - {personName}", parameters, options);
     }
 
     public void Dispose()
