@@ -6,85 +6,84 @@
 @inject AuthenticationStateService AuthStateService
 @inject NavigationManager Navigation
 @inject CheckInService CheckInService
+@inject LoginService LoginService
 @implements IDisposable
 
 <PageTitle>Admin</PageTitle>
 
+<h1>Admin Dashboard</h1>
+
 @if (!AuthStateService.IsAuthenticated)
 {
-    <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8">
-        <MudCard>
-            <MudCardContent>
-                <MudText Typo="Typo.h4" Class="mb-4">Access Denied</MudText>
-                <MudText Class="mb-4">You must be logged in as an administrator to access this page.</MudText>
-                <MudButton Variant="Variant.Filled" 
-                          Color="Color.Primary" 
-                          StartIcon="Icons.Material.Filled.Login"
-                          @onclick="@(() => Navigation.NavigateTo("/"))">
-                    Go to Login
-                </MudButton>
-            </MudCardContent>
-        </MudCard>
-    </MudContainer>
+    <div class="mt-4">
+        <h3>Admin Login</h3>
+        
+        @if (errorMessage != null)
+        {
+            <div class="alert alert-danger">@errorMessage</div>
+        }
+        
+        <div class="mb-3">
+            <label class="form-label">Username:</label>
+            <input @bind="username" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Password:</label>
+            <input type="password" @bind="password" class="form-control" />
+        </div>
+        <MudButton Variant="Variant.Filled" 
+                  Color="Color.Primary" 
+                  Size="Size.Small"
+                  @onclick="HandleLogin">
+            Login
+        </MudButton>
+    </div>
 }
 else
 {
-    <h1>Admin Dashboard</h1>
-
     <p>Welcome to the admin panel, @AuthStateService.CurrentUser! You have successfully logged in.</p>
 
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
-    <MudCard>
-        <MudCardHeader>
-            <CardHeaderContent>
-                <MudText Typo="Typo.h6">Check-In Records</MudText>
-            </CardHeaderContent>
-        </MudCardHeader>
-        <MudCardContent>
-            <MudTable Items="@CheckInService.CheckInRecords" Hover="true" Striped="true" Dense="true">
-                <HeaderContent>
-                    <MudTh>First Name</MudTh>
-                    <MudTh>Last Name</MudTh>
-                    <MudTh>Phone</MudTh>
-                    <MudTh>Paid</MudTh>
-                    <MudTh>Actions</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="First Name">@context.FirstName</MudTd>
-                    <MudTd DataLabel="Last Name">@context.LastName</MudTd>
-                    <MudTd DataLabel="Phone">@context.Phone</MudTd>
-                    <MudTd DataLabel="Paid">
-                        <MudChip T="string" Color="@(context.IsPaid ? Color.Success : Color.Error)" 
-                                Size="Size.Small" 
-                                Variant="Variant.Filled">
-                            @(context.IsPaid ? "Yes" : "No")
-                        </MudChip>
-                    </MudTd>
-                    <MudTd DataLabel="Actions">
-                        <MudButton Variant="Variant.Text" 
-                                  Color="Color.Primary" 
-                                  Size="Size.Small"
-                                  StartIcon="Icons.Material.Filled.Edit"
-                                  @onclick="@(() => TogglePaymentStatus(CheckInService.CheckInRecords.ToList().IndexOf(context)))">
-                            Toggle Payment
-                        </MudButton>
-                        <MudButton Variant="Variant.Text" 
-                                  Color="Color.Error" 
-                                  Size="Size.Small"
-                                  StartIcon="Icons.Material.Filled.Delete"
-                                  @onclick="@(async () => await DeleteRecord(CheckInService.CheckInRecords.ToList().IndexOf(context)))">
-                            Delete
-                        </MudButton>
-                    </MudTd>
-                </RowTemplate>
-            </MudTable>
-        </MudCardContent>
-    </MudCard>
-</MudContainer>
+<div class="mt-4">
+    @foreach (var record in CheckInService.CheckInRecords)
+    {
+        <div class="d-flex align-items-center py-1 px-0" style="border-bottom: 1px solid #e0e0e0;">
+            <div class="flex-grow-1 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <span style="font-size: 14px;">
+                        <strong>@record.FirstName @record.LastName</strong> - @record.Phone
+                    </span>
+                    <MudChip T="string" Color="@(record.IsPaid ? Color.Success : Color.Error)" 
+                            Size="Size.Small" 
+                            Variant="Variant.Filled"
+                            Class="ms-2">
+                        @(record.IsPaid ? "Paid" : "Unpaid")
+                    </MudChip>
+                </div>
+                <div class="d-flex align-items-center">
+                    <MudButton Variant="Variant.Text" 
+                              Color="Color.Primary" 
+                              Size="Size.Small"
+                              StartIcon="Icons.Material.Filled.Edit"
+                              @onclick="@(() => TogglePaymentStatus(CheckInService.CheckInRecords.ToList().IndexOf(record)))">
+                        Toggle
+                    </MudButton>
+                    <MudButton Variant="Variant.Text" 
+                              Color="Color.Error" 
+                              Size="Size.Small"
+                              StartIcon="Icons.Material.Filled.Delete"
+                              @onclick="@(async () => await DeleteRecord(CheckInService.CheckInRecords.ToList().IndexOf(record)))">
+                        Delete
+                    </MudButton>
+                </div>
+            </div>
+        </div>
+    }
+</div>
 
 <div class="mt-4">
     <MudButton Variant="Variant.Filled" 
               Color="Color.Secondary" 
+              Size="Size.Small"
               StartIcon="Icons.Material.Filled.Logout"
               @onclick="Logout">
         Logout
@@ -94,6 +93,10 @@ else
 
 @code {
     [Inject] IDialogService DialogService { get; set; } = default!;
+    
+    private string username = string.Empty;
+    private string password = string.Empty;
+    private string? errorMessage;
 
     protected override void OnInitialized()
     {
@@ -109,6 +112,18 @@ else
     private void OnAuthStateChanged(object? sender, PropertyChangedEventArgs e)
     {
         InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleLogin()
+    {
+        if (LoginService.Authenticate(username, password))
+        {
+            // Login successful, page will update automatically
+        }
+        else
+        {
+            errorMessage = "Invalid username or password.";
+        }
     }
 
     private void TogglePaymentStatus(int index)

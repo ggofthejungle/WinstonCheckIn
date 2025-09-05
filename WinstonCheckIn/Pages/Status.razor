@@ -11,44 +11,36 @@
 
 <p>View all check-in records below.</p>
 
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
-    <MudCard>
-        <MudCardHeader>
-            <CardHeaderContent>
-                <MudText Typo="Typo.h6">All Check-In Records</MudText>
-            </CardHeaderContent>
-        </MudCardHeader>
-        <MudCardContent>
-            @if (CheckInService.CheckInRecords.Any())
-            {
-                <MudTable Items="@CheckInService.CheckInRecords" Hover="true" Striped="true" Dense="true">
-                    <HeaderContent>
-                        <MudTh>First Name</MudTh>
-                        <MudTh>Last Name</MudTh>
-                        <MudTh>Phone</MudTh>
-                        <MudTh>Paid</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="First Name">@context.FirstName</MudTd>
-                        <MudTd DataLabel="Last Name">@context.LastName</MudTd>
-                        <MudTd DataLabel="Phone">@context.Phone</MudTd>
-                        <MudTd DataLabel="Paid">
-                            <MudChip T="string" Color="@(context.IsPaid ? Color.Success : Color.Error)" 
-                                    Size="Size.Small" 
-                                    Variant="Variant.Filled">
-                                @(context.IsPaid ? "Yes" : "No")
-                            </MudChip>
-                        </MudTd>
-                    </RowTemplate>
-                </MudTable>
-            }
-            else
-            {
-                <MudText>No check-in records found.</MudText>
-            }
-        </MudCardContent>
-    </MudCard>
-</MudContainer>
+@if (CheckInService.CheckInRecords.Any())
+{
+    <div class="mt-4">
+        @foreach (var record in CheckInService.CheckInRecords)
+        {
+            <div class="d-flex align-items-center py-1 px-0" style="border-bottom: 1px solid #e0e0e0;">
+                <div class="flex-grow-1 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <span style="font-size: 14px;">
+                            <strong>@record.FirstName @record.LastName</strong> - @record.Phone
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <MudChip T="string" Color="@(record.IsPaid ? Color.Success : Color.Error)" 
+                                Size="Size.Small" 
+                                Variant="Variant.Filled">
+                            @(record.IsPaid ? "Paid" : "Unpaid")
+                        </MudChip>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="mt-4">
+        <MudText>No check-in records found.</MudText>
+    </div>
+}
 
 @code {
     protected override void OnInitialized()

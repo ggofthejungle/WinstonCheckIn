@@ -12,6 +12,12 @@ namespace WinstonCheckIn.Services
 
         public void AddCheckIn(string firstName, string lastName, string phoneNumber)
         {
+            // Enforce 28 person limit
+            if (_checkInRecords.Count >= 28)
+            {
+                return; // Don't add if we've reached the limit
+            }
+
             var record = new CheckInRecord
             {
                 FirstName = firstName,
