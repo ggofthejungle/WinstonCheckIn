@@ -12,5 +12,6 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddMudServices();
 builder.Services.AddScoped<AuthenticationStateService>();
 builder.Services.AddScoped<LoginService>();
+builder.Services.AddScoped<CheckInService>();
 
 await builder.Build().RunAsync();
