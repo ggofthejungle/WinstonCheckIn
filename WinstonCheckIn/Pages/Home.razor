@@ -158,36 +158,35 @@
 }
 
 <div class="admin-section">
-        <h3>Admin Login</h3>
+    <h3>Admin Login</h3>
 
-        @if (AuthStateService.IsAuthenticated)
-        {
-            <div style="margin-top: 20px;">
-                <h4>Welcome, @AuthStateService.CurrentUser!</h4>
-                <p>You are successfully logged in.</p>
-                <button @onclick="Logout" class="btn btn-secondary">Logout</button>
+    @if (AuthStateService.IsAuthenticated)
+    {
+        <div style="margin-top: 20px;">
+            <h4>Welcome, @AuthStateService.CurrentUser!</h4>
+            <p>You are successfully logged in.</p>
+            <button @onclick="Logout" class="btn btn-secondary">Logout</button>
+        </div>
+    }
+    else
+    {
+        <div style="margin-top: 20px;">
+            @if (errorMessage != null)
+            {
+                <p style="color: red;">@errorMessage</p>
+            }
+            
+            <div style="margin-bottom: 10px;">
+                <label>Username:</label>
+                <input @bind="username" style="margin-left: 10px;" />
             </div>
-        }
-        else
-        {
-            <div style="margin-top: 20px;">
-                @if (errorMessage != null)
-                {
-                    <p style="color: red;">@errorMessage</p>
-                }
-                
-                <div style="margin-bottom: 10px;">
-                    <label>Username:</label>
-                    <input @bind="username" style="margin-left: 10px;" />
-                </div>
-                <div style="margin-bottom: 10px;">
-                    <label>Password:</label>
-                    <input type="password" @bind="password" style="margin-left: 10px;" />
-                </div>
-                <button @onclick="HandleLogin" class="btn btn-primary">Login</button>
+            <div style="margin-bottom: 10px;">
+                <label>Password:</label>
+                <input type="password" @bind="password" style="margin-left: 10px;" />
             </div>
-        }
-    </div>
+            <button @onclick="HandleLogin" class="btn btn-primary">Login</button>
+        </div>
+    }
 </div>
 
 @code {

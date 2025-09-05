@@ -1,19 +1,68 @@
-﻿@page "/status"
+﻿@using WinstonCheckIn.Services
+@using System.ComponentModel
+@using MudBlazor
+@page "/status"
+@inject CheckInService CheckInService
+@implements IDisposable
 
 <PageTitle>Status</PageTitle>
 
-<h1>Status</h1>
+<h1>Check-In Status</h1>
 
-<p role="status">Current count: @currentCount</p>
+<p>View all check-in records below.</p>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <MudCard>
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">All Check-In Records</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            @if (CheckInService.CheckInRecords.Any())
+            {
+                <MudTable Items="@CheckInService.CheckInRecords" Hover="true" Striped="true" Dense="true">
+                    <HeaderContent>
+                        <MudTh>First Name</MudTh>
+                        <MudTh>Last Name</MudTh>
+                        <MudTh>Phone</MudTh>
+                        <MudTh>Paid</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="First Name">@context.FirstName</MudTd>
+                        <MudTd DataLabel="Last Name">@context.LastName</MudTd>
+                        <MudTd DataLabel="Phone">@context.Phone</MudTd>
+                        <MudTd DataLabel="Paid">
+                            <MudChip T="string" Color="@(context.IsPaid ? Color.Success : Color.Error)" 
+                                    Size="Size.Small" 
+                                    Variant="Variant.Filled">
+                                @(context.IsPaid ? "Yes" : "No")
+                            </MudChip>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            }
+            else
+            {
+                <MudText>No check-in records found.</MudText>
+            }
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
 
 @code {
-    private int currentCount = 0;
-
-    private void IncrementCount()
+    protected override void OnInitialized()
     {
-        currentCount++;
+        CheckInService.PropertyChanged += OnCheckInServiceChanged;
     }
 
+    private void OnCheckInServiceChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        CheckInService.PropertyChanged -= OnCheckInServiceChanged;
+    }
 }

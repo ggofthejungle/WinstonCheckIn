@@ -1,0 +1,83 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; 
+    background-color: #e0e0e0; 
+    margin: 0;
+}
+
+.form-container {
+    background-color: #ffffff; 
+    padding: 40px;
+    border-radius: 5px; 
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); 
+    width: 350px; 
+    max-width: 90%; 
+    text-align: center;
+}
+
+.company-header {
+    margin-bottom: 30px;
+}
+
+.logo {
+    width: 150px; 
+    height: auto;
+    margin-bottom: 5px;
+}
+
+.tagline {
+    font-size: 0.8em;
+    color: #666;
+    margin-top: 0;
+}
+
+.input-group {
+    margin-bottom: 20px; 
+}
+
+input[type="text"],
+input[type="tel"] {
+    width: calc(100% - 20px); 
+    padding: 15px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f0f0f0; 
+    color: #666; 
+    font-size: 1.1em;
+    text-align: center;
+    box-sizing: border-box; 
+    font-weight: bold; 
+}
+
+
+input[type="text"]::placeholder,
+input[type="tel"]::placeholder {
+    font-weight: bold;
+    color: #888; 
+}
+
+input[type="text"]:focus,
+input[type="tel"]:focus {
+    border-color: #007bff; 
+    outline: none;
+}
+
+.enter-button {
+    background-color: #007bff; 
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2em;
+    cursor: pointer;
+    margin-top: 20px;
+    width: 60%; 
+    font-weight: bold;
+}
+
+.enter-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}

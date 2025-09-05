@@ -1,9 +1,11 @@
 ﻿@using WinstonCheckIn.Services
 @using MudBlazor
+@using System.ComponentModel
 @page "/admin"
 @inject HttpClient Http
 @inject AuthenticationStateService AuthStateService
 @inject NavigationManager Navigation
+@inject CheckInService CheckInService
 @implements IDisposable
 
 <PageTitle>Admin</PageTitle>
@@ -20,7 +22,7 @@
             </CardHeaderContent>
         </MudCardHeader>
         <MudCardContent>
-            <MudTable Items="@checkInRecords" Hover="true" Striped="true" Dense="true">
+            <MudTable Items="@CheckInService.CheckInRecords" Hover="true" Striped="true" Dense="true">
                 <HeaderContent>
                     <MudTh>First Name</MudTh>
                     <MudTh>Last Name</MudTh>
@@ -43,13 +45,15 @@
                         <MudButton Variant="Variant.Text" 
                                   Color="Color.Primary" 
                                   Size="Size.Small"
-                                  StartIcon="Icons.Material.Filled.Edit">
-                            Edit
+                                  StartIcon="Icons.Material.Filled.Edit"
+                                  @onclick="@(() => TogglePaymentStatus(CheckInService.CheckInRecords.ToList().IndexOf(context)))">
+                            Toggle Payment
                         </MudButton>
                         <MudButton Variant="Variant.Text" 
                                   Color="Color.Error" 
                                   Size="Size.Small"
-                                  StartIcon="Icons.Material.Filled.Delete">
+                                  StartIcon="Icons.Material.Filled.Delete"
+                                  @onclick="@(() => DeleteRecord(CheckInService.CheckInRecords.ToList().IndexOf(context)))">
                             Delete
                         </MudButton>
                     </MudTd>
@@ -60,34 +64,29 @@
 </MudContainer>
 
 @code {
-    private List<CheckInRecord> checkInRecords = new();
-
     protected override void OnInitialized()
     {
-        // Prepopulate with sample data
-        checkInRecords = new List<CheckInRecord>
-        {
-            new CheckInRecord { FirstName = "John", LastName = "Doe", Phone = "(555) 123-4567", IsPaid = true },
-            new CheckInRecord { FirstName = "Jane", LastName = "Smith", Phone = "(555) 234-5678", IsPaid = false },
-            new CheckInRecord { FirstName = "Mike", LastName = "Johnson", Phone = "(555) 345-6789", IsPaid = true },
-            new CheckInRecord { FirstName = "Sarah", LastName = "Williams", Phone = "(555) 456-7890", IsPaid = true },
-            new CheckInRecord { FirstName = "David", LastName = "Brown", Phone = "(555) 567-8901", IsPaid = false },
-            new CheckInRecord { FirstName = "Lisa", LastName = "Davis", Phone = "(555) 678-9012", IsPaid = true },
-            new CheckInRecord { FirstName = "Tom", LastName = "Wilson", Phone = "(555) 789-0123", IsPaid = false },
-            new CheckInRecord { FirstName = "Amy", LastName = "Miller", Phone = "(555) 890-1234", IsPaid = true }
-        };
+        CheckInService.PropertyChanged += OnCheckInServiceChanged;
+    }
+
+    private void OnCheckInServiceChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void TogglePaymentStatus(int index)
+    {
+        var record = CheckInService.CheckInRecords[index];
+        CheckInService.UpdatePaymentStatus(index, !record.IsPaid);
+    }
+
+    private void DeleteRecord(int index)
+    {
+        CheckInService.RemoveCheckIn(index);
     }
 
     public void Dispose()
     {
-        // No cleanup needed for this page
-    }
-
-    public class CheckInRecord
-    {
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public string Phone { get; set; } = string.Empty;
-        public bool IsPaid { get; set; }
+        CheckInService.PropertyChanged -= OnCheckInServiceChanged;
     }
 }
