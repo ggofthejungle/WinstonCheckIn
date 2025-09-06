@@ -4,6 +4,7 @@
 @using Microsoft.JSInterop
 @page "/"
 @inject CheckInService CheckInService
+@inject EventDataService EventDataService
 @inject ISnackbar Snackbar
 @inject IJSRuntime JSRuntime
 @implements IDisposable
@@ -202,7 +203,7 @@
             </MudAlert>
         </div>
     }
-    else if (CheckInService.CheckInRecords.Count < 28)
+    else if (EventDataService.CurrentEvent?.IsCheckInEnabled == true && CheckInService.CheckInRecords.Count < 28)
     {
         <form @onsubmit="HandleCheckIn" @onsubmit:preventDefault="true">
             <div class="input-group">
@@ -299,6 +300,15 @@
             <p style="color: green; margin-top: 15px;">@checkInMessage</p>
         }
     }
+    else if (EventDataService.CurrentEvent?.IsCheckInEnabled != true)
+    {
+        <div class="mt-4">
+            <MudAlert Severity="Severity.Info" Class="mb-4">
+                <MudText Typo="Typo.h6" Class="mb-2">Check-in Not Available</MudText>
+                <MudText>Check-in has not been enabled for today's event yet. Please check back later!</MudText>
+            </MudAlert>
+        </div>
+    }
     else
     {
         <div class="mt-4">
@@ -360,6 +370,15 @@
     protected override async Task OnInitializedAsync()
     {
         CheckInService.PropertyChanged += OnCheckInServiceChanged;
+        EventDataService.PropertyChanged += OnEventDataChanged;
+        await EventDataService.LoadEventsAsync();
+        
+        // Set current event for check-ins
+        if (EventDataService.CurrentEvent != null)
+        {
+            await CheckInService.SetCurrentEventAsync(EventDataService.CurrentEvent.Id);
+        }
+        
         module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/signature.js");
     }
 
@@ -376,6 +395,16 @@
     private void OnCheckInServiceChanged(object? sender, PropertyChangedEventArgs e)
     {
         InvokeAsync(StateHasChanged);
+    }
+
+    private async void OnEventDataChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        // Update current event when events change
+        if (EventDataService.CurrentEvent != null)
+        {
+            await CheckInService.SetCurrentEventAsync(EventDataService.CurrentEvent.Id);
+        }
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task InitializeSignaturePad()
@@ -603,7 +632,7 @@
         bool isLastPerson = CheckInService.CheckInRecords.Count == 27;
 
         // Add the check-in record to the service with waiver and signature
-        CheckInService.AddCheckIn(firstName, lastName, phoneNumber, true, signatureData);
+        await CheckInService.AddCheckIn(firstName, lastName, phoneNumber, true, signatureData);
         
         // Mark as checked in to hide the form
         hasCheckedIn = true;
@@ -626,6 +655,7 @@
     public void Dispose()
     {
         CheckInService.PropertyChanged -= OnCheckInServiceChanged;
+        EventDataService.PropertyChanged -= OnEventDataChanged;
         signatureCheckTimer?.Dispose();
     }
 }

@@ -132,13 +132,13 @@
                 var phone = GeneratePhoneNumber(random);
                 var isPaid = random.Next(2) == 1; // 50% chance of being paid
 
-                CheckInService.AddCheckIn(firstName, lastName, phone);
+                CheckInService.AddCheckIn(firstName, lastName, phone, true, null);
                 
                 // Set payment status if paid
                 if (isPaid)
                 {
                     var index = CheckInService.CheckInRecords.Count - 1;
-                    CheckInService.UpdatePaymentStatus(index, true);
+                    CheckInService.TogglePaymentStatus(index);
                 }
 
                 // Small delay to show progress
@@ -179,15 +179,16 @@
         var dialog = await DialogService.ShowAsync<MudMessageBox>("Clear All Data", parameters, options);
         var result = await dialog.Result;
 
-        if (!result.Canceled)
+        if (result != null && !result.Canceled)
         {
-            // Clear all records by removing them one by one
-            while (CheckInService.CheckInRecords.Count > 0)
+            // Clear all records except the organizer (index 0)
+            // Remove from the end to avoid index shifting issues
+            for (int i = CheckInService.CheckInRecords.Count - 1; i > 0; i--)
             {
-                CheckInService.RemoveCheckIn(0);
+                CheckInService.RemoveCheckIn(i);
             }
 
-            message = "All data has been cleared!";
+            message = "All check-in data has been cleared! (Organizer record preserved)";
             alertSeverity = Severity.Info;
         }
     }

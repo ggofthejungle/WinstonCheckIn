@@ -1,0 +1,85 @@
+@using WinstonCheckIn.Services
+@using MudBlazor
+@using Microsoft.JSInterop
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="form" @bind-IsValid="@isValid" @bind-Errors="@errors">
+            <MudTextField @bind-Value="eventName" 
+                         Label="Event Name" 
+                         Required="true" 
+                         RequiredError="Event name is required"
+                         Class="mb-3" />
+            
+            <MudDatePicker @bind-Date="eventDate" 
+                          Label="Event Date" 
+                          Required="true" 
+                          RequiredError="Event date is required"
+                          Class="mb-3" />
+            
+            <MudTextField @bind-Value="description" 
+                         Label="Description" 
+                         Lines="3" 
+                         Class="mb-3" />
+            
+            <MudNumericField @bind-Value="maxParticipants" 
+                            Label="Max Participants" 
+                            Min="1" 
+                            Max="100" 
+                            Class="mb-3" />
+            
+            <MudCheckBox @bind-Value="enableCheckIn" 
+                        Label="Enable check-in immediately" 
+                        Class="mb-3" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" 
+                  Variant="Variant.Filled" 
+                  OnClick="Save" 
+                  Disabled="@(!isValid)">
+            Create Event
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = null!;
+    
+    [Parameter] public EventDataService EventDataService { get; set; } = null!;
+    
+    private MudForm form = null!;
+    private bool isValid = false;
+    private string[] errors = { };
+    
+    private string eventName = string.Empty;
+    private DateTime? eventDate = DateTime.Today;
+    private string description = string.Empty;
+    private int maxParticipants = 28;
+    private bool enableCheckIn = false;
+
+    private async Task Save()
+    {
+        if (isValid && eventDate.HasValue)
+        {
+            var newEvent = new Event
+            {
+                Name = eventName,
+                EventDate = eventDate.Value,
+                Description = description,
+                MaxParticipants = maxParticipants,
+                IsCheckInEnabled = enableCheckIn,
+                CheckInStartTime = enableCheckIn ? DateTime.Now : null
+            };
+            
+            await EventDataService.CreateEventAsync(newEvent);
+            MudDialog.Close();
+        }
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}
