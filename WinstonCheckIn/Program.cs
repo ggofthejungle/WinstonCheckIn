@@ -10,8 +10,11 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddMudServices();
+
+// Services
 builder.Services.AddScoped<AuthenticationStateService>();
 builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<CheckInService>();
+builder.Services.AddScoped<EventDataService>();
 
 await builder.Build().RunAsync();
