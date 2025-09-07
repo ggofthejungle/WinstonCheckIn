@@ -1,0 +1,88 @@
+@using WinstonCheckIn.Services
+
+<div class="status-circle">
+    <div class="status-circle-inner">
+        <div class="status-circle-content">
+            <div class="status-circle-title">@Event?.Name</div>
+            <div class="status-circle-subtitle">@Event?.EventDate.ToString("MMM dd, yyyy")</div>
+            <div class="status-circle-count">@CurrentParticipants</div>
+            <div class="status-circle-label">Participants</div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .status-circle {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .status-circle::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    }
+
+    .status-circle-inner {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .status-circle-content {
+        text-align: center;
+        color: white;
+        z-index: 1;
+    }
+
+    .status-circle-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        line-height: 1.2;
+    }
+
+    .status-circle-subtitle {
+        font-size: 12px;
+        opacity: 0.8;
+        margin-bottom: 8px;
+    }
+
+    .status-circle-count {
+        font-size: 32px;
+        font-weight: 700;
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+
+    .status-circle-label {
+        font-size: 12px;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>
+
+@code {
+    [Parameter] public Event? Event { get; set; }
+    [Parameter] public int CurrentParticipants { get; set; }
+}
