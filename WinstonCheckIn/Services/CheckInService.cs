@@ -42,35 +42,19 @@ namespace WinstonCheckIn.Services
                     else
                     {
                         _checkInRecords.Clear();
-                        // Add organizer as the first entry
-                        AddOrganizer();
+                        // No organizer placeholder - admin will be first to check in
                     }
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error loading check-in records: {ex.Message}");
                     _checkInRecords.Clear();
-                    AddOrganizer();
+                    // No organizer placeholder - admin will be first to check in
                 }
             }
             OnPropertyChanged(nameof(CheckInRecords));
         }
 
-        private void AddOrganizer()
-        {
-            var organizer = new CheckInRecord
-            {
-                FirstName = "Organizer",
-                LastName = "",
-                Phone = "N/A",
-                IsPaid = true, // Organizer is considered paid
-                WaiverAccepted = true,
-                SignatureData = null,
-                CheckInTime = DateTime.Now.AddDays(-1) // Set to yesterday to appear first
-            };
-
-            _checkInRecords.Add(organizer);
-        }
 
         public async Task AddCheckIn(string firstName, string lastName, string phone, bool waiverAccepted, string? signatureData)
         {
@@ -106,12 +90,6 @@ namespace WinstonCheckIn.Services
         {
             if (index >= 0 && index < _checkInRecords.Count)
             {
-                // Prevent deleting the organizer (first entry)
-                if (index == 0 && _checkInRecords[0].FirstName == "Organizer")
-                {
-                    return; // Don't delete the organizer
-                }
-                
                 _checkInRecords.RemoveAt(index);
                 await SaveCheckInRecordsAsync();
                 OnPropertyChanged(nameof(CheckInRecords));
@@ -128,11 +106,10 @@ namespace WinstonCheckIn.Services
             }
         }
 
+
         public async Task ClearAllCheckIns()
         {
             _checkInRecords.Clear();
-            // Re-add the organizer
-            AddOrganizer();
             await SaveCheckInRecordsAsync();
             OnPropertyChanged(nameof(CheckInRecords));
         }
@@ -153,7 +130,6 @@ namespace WinstonCheckIn.Services
                 
                 // Clear current records after archiving
                 _checkInRecords.Clear();
-                AddOrganizer();
                 await SaveCheckInRecordsAsync();
                 OnPropertyChanged(nameof(CheckInRecords));
             }

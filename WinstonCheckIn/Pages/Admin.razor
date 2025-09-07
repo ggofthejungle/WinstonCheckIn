@@ -1,12 +1,15 @@
 ﻿@using WinstonCheckIn.Services
 @using MudBlazor
 @using System.ComponentModel
+@using System.Text
+@using Microsoft.JSInterop
 @page "/admin"
 @inject HttpClient Http
 @inject AuthenticationStateService AuthStateService
 @inject NavigationManager Navigation
 @inject CheckInService CheckInService
 @inject LoginService LoginService
+@inject IJSRuntime JSRuntime
 @implements IDisposable
 
 <PageTitle>Admin</PageTitle>
@@ -44,6 +47,24 @@ else
     <p>Welcome to the admin panel, @AuthStateService.CurrentUser! You have successfully logged in.</p>
 
 <div class="mt-4">
+    <MudButton Variant="Variant.Filled" 
+              Color="Color.Info" 
+              Size="Size.Medium"
+              StartIcon="Icons.Material.Filled.Print"
+              @onclick="PrintAllRecords"
+              Class="me-3">
+        Print All Records
+    </MudButton>
+    <MudButton Variant="Variant.Filled" 
+              Color="Color.Secondary" 
+              Size="Size.Medium"
+              StartIcon="Icons.Material.Filled.Logout"
+              @onclick="Logout">
+        Logout
+    </MudButton>
+</div>
+
+<div class="mt-4">
     @foreach (var record in CheckInService.CheckInRecords)
     {
                         <div class="d-flex align-items-center py-1 px-0" style="border-bottom: 1px solid #e0e0e0;">
@@ -78,30 +99,17 @@ else
                                       @onclick="@(() => TogglePaymentStatus(CheckInService.CheckInRecords.ToList().IndexOf(record)))">
                                 Toggle
                             </MudButton>
-                            @if (record.FirstName != "Organizer")
-                            {
-                                <MudButton Variant="Variant.Text" 
-                                          Color="Color.Error" 
-                                          Size="Size.Small"
-                                          StartIcon="Icons.Material.Filled.Delete"
-                                          @onclick="@(async () => await DeleteRecord(CheckInService.CheckInRecords.ToList().IndexOf(record)))">
-                                    Delete
-                                </MudButton>
-                            }
+                            <MudButton Variant="Variant.Text" 
+                                      Color="Color.Error" 
+                                      Size="Size.Small"
+                                      StartIcon="Icons.Material.Filled.Delete"
+                                      @onclick="@(async () => await DeleteRecord(CheckInService.CheckInRecords.ToList().IndexOf(record)))">
+                                Delete
+                            </MudButton>
                         </div>
                     </div>
                 </div>
     }
-</div>
-
-<div class="mt-4">
-    <MudButton Variant="Variant.Filled" 
-              Color="Color.Secondary" 
-              Size="Size.Small"
-              StartIcon="Icons.Material.Filled.Logout"
-              @onclick="Logout">
-        Logout
-    </MudButton>
 </div>
 }
 
@@ -140,10 +148,10 @@ else
         }
     }
 
-    private void TogglePaymentStatus(int index)
+    private async Task TogglePaymentStatus(int index)
     {
         var record = CheckInService.CheckInRecords[index];
-        CheckInService.TogglePaymentStatus(index);
+        await CheckInService.TogglePaymentStatus(index);
     }
 
     private async Task DeleteRecord(int index)
@@ -195,6 +203,59 @@ else
 
         await DialogService.ShowAsync<SignatureDialog>($"Signature - {personName}", parameters, options);
     }
+
+    private async Task PrintAllRecords()
+    {
+        var printContent = GenerateAllRecordsPrintContent();
+        await JSRuntime.InvokeVoidAsync("printContent", printContent, "All Check-In Records");
+    }
+
+    private string GenerateAllRecordsPrintContent()
+    {
+        var html = new StringBuilder();
+        
+        html.AppendLine("<!DOCTYPE html>");
+        html.AppendLine("<html>");
+        html.AppendLine("<head>");
+        html.AppendLine("<title>All Check-In Records</title>");
+        html.AppendLine("<style>");
+        html.AppendLine("body { font-family: Arial, sans-serif; margin: 3px; padding: 0; line-height: 1.1; font-size: 11px; }");
+        html.AppendLine(".header { text-align: center; border-bottom: 1px solid #333; padding-bottom: 3px; margin-bottom: 5px; }");
+        html.AppendLine(".header h1 { font-size: 14px; margin: 0; }");
+        html.AppendLine(".record { margin-bottom: 3px; padding: 2px; }");
+        html.AppendLine(".signature { max-width: 45px; max-height: 18px; border: 1px solid #ccc; vertical-align: middle; }");
+        html.AppendLine("@media print { body { margin: 2px; padding: 0; } .no-print { display: none; } }");
+        html.AppendLine("</style>");
+        html.AppendLine("</head>");
+        html.AppendLine("<body>");
+        html.AppendLine("<div class=\"header\">");
+        html.AppendLine("<h1>Winston Check-In Records</h1>");
+        html.AppendLine("<p>Salt Creek Rural Park District</p>");
+        html.AppendLine("</div>");
+        
+        foreach (var record in CheckInService.CheckInRecords)
+        {
+            html.AppendLine("<div class=\"record\">");
+            html.Append(record.FirstName + " " + record.LastName + " - " + record.Phone);
+            
+            if (!string.IsNullOrEmpty(record.SignatureData))
+            {
+                html.Append(" - <img src=\"" + record.SignatureData + "\" class=\"signature\" />");
+            }
+            else
+            {
+                html.Append(" - No signature");
+            }
+            
+            html.AppendLine("</div>");
+        }
+        
+        html.AppendLine("</body>");
+        html.AppendLine("</html>");
+        
+        return html.ToString();
+    }
+
 
     public void Dispose()
     {

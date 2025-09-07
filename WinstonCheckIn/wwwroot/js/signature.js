@@ -79,6 +79,34 @@ window.isCanvasEmpty = function(canvasId) {
     return true;
 };
 
+// Print function for check-in records
+window.printContent = function(htmlContent, title) {
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    
+    if (printWindow) {
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+        
+        // Wait for images to load before printing
+        printWindow.onload = function() {
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        };
+    } else {
+        // Fallback if popup is blocked
+        const printDiv = document.createElement('div');
+        printDiv.innerHTML = htmlContent;
+        printDiv.style.position = 'absolute';
+        printDiv.style.left = '-9999px';
+        document.body.appendChild(printDiv);
+        
+        window.print();
+        document.body.removeChild(printDiv);
+    }
+};
+
 // Legacy function for compatibility
 export function initializeSignaturePad(canvasId) {
     return new Promise((resolve) => {
