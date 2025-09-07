@@ -4,11 +4,34 @@
 @page "/data-utility"
 @inject CheckInService CheckInService
 @inject IDialogService DialogService
+@inject AuthenticationStateService AuthStateService
+@inject NavigationManager Navigation
 @implements IDisposable
 
 <PageTitle>Data Utility</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+@if (!AuthStateService.IsAuthenticated)
+{
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+        <MudCard>
+            <MudCardContent>
+                <MudAlert Severity="Severity.Warning" Class="mb-4">
+                    <MudText Typo="Typo.h6">Access Denied</MudText>
+                    <MudText>You must be logged in as an administrator to access this page.</MudText>
+                </MudAlert>
+                <MudButton Variant="Variant.Filled" 
+                          Color="Color.Primary" 
+                          StartIcon="Icons.Material.Filled.Login"
+                          @onclick="NavigateToLogin">
+                    Go to Login
+                </MudButton>
+            </MudCardContent>
+        </MudCard>
+    </MudContainer>
+}
+else
+{
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
     <MudCard>
         <MudCardHeader>
             <CardHeaderContent>
@@ -78,7 +101,8 @@
             }
         </div>
     }
-</MudContainer>
+    </MudContainer>
+}
 
 @code {
     private bool isLoading = false;
@@ -100,6 +124,17 @@
     protected override void OnInitialized()
     {
         CheckInService.PropertyChanged += OnCheckInServiceChanged;
+        AuthStateService.PropertyChanged += OnAuthStateChanged;
+    }
+
+    private void OnAuthStateChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void NavigateToLogin()
+    {
+        Navigation.NavigateTo("/admin");
     }
 
     private void OnCheckInServiceChanged(object? sender, PropertyChangedEventArgs e)
@@ -199,5 +234,6 @@
     public void Dispose()
     {
         CheckInService.PropertyChanged -= OnCheckInServiceChanged;
+        AuthStateService.PropertyChanged -= OnAuthStateChanged;
     }
 }

@@ -3,11 +3,21 @@
 @using MudBlazor
 @page "/status"
 @inject CheckInService CheckInService
+@inject EventDataService EventDataService
 @implements IDisposable
 
 <PageTitle>Status</PageTitle>
 
 <h1>Check-In Status</h1>
+
+@if (EventDataService.CurrentEvent != null)
+{
+    <div class="status-section mb-4">
+        <div class="d-flex justify-content-center">
+            <StatusCircle Event="@EventDataService.CurrentEvent" CurrentParticipants="@CheckInService.CheckInRecords.Count" />
+        </div>
+    </div>
+}
 
 <p>View all check-in records below.</p>
 
@@ -43,9 +53,17 @@ else
 }
 
 @code {
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         CheckInService.PropertyChanged += OnCheckInServiceChanged;
+        EventDataService.PropertyChanged += OnEventDataChanged;
+        await EventDataService.LoadEventsAsync();
+        
+        // Set current event for check-ins
+        if (EventDataService.CurrentEvent != null)
+        {
+            await CheckInService.SetCurrentEventAsync(EventDataService.CurrentEvent.Id);
+        }
     }
 
     private void OnCheckInServiceChanged(object? sender, PropertyChangedEventArgs e)
@@ -53,8 +71,19 @@ else
         InvokeAsync(StateHasChanged);
     }
 
+    private async void OnEventDataChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        // Update current event when events change
+        if (EventDataService.CurrentEvent != null)
+        {
+            await CheckInService.SetCurrentEventAsync(EventDataService.CurrentEvent.Id);
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
     public void Dispose()
     {
         CheckInService.PropertyChanged -= OnCheckInServiceChanged;
+        EventDataService.PropertyChanged -= OnEventDataChanged;
     }
 }

@@ -176,7 +176,7 @@ else
 
         if (result != null && !result.Canceled)
         {
-            CheckInService.RemoveCheckIn(index);
+            await CheckInService.RemoveCheckIn(index);
         }
     }
 
@@ -224,7 +224,7 @@ else
         html.AppendLine(".header h1 { font-size: 14px; margin: 0; }");
         html.AppendLine(".record { margin-bottom: 3px; padding: 2px; }");
         html.AppendLine(".signature { max-width: 45px; max-height: 18px; border: 1px solid #ccc; vertical-align: middle; }");
-        html.AppendLine("@media print { body { margin: 2px; padding: 0; } .no-print { display: none; } }");
+        html.AppendLine("@media print { body { margin: 2px; padding: 0; } .no-print { display: none; } .signature { border: none !important; outline: none !important; } }");
         html.AppendLine("</style>");
         html.AppendLine("</head>");
         html.AppendLine("<body>");

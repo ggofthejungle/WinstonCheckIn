@@ -1,15 +1,36 @@
-@using WinstonCheckIn.Services
-@using MudBlazor
 @using System.ComponentModel
 @page "/events"
 @inject EventDataService EventDataService
 @inject CheckInService CheckInService
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
+@inject AuthenticationStateService AuthStateService
+@inject NavigationManager Navigation
 @implements IDisposable
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
-    <MudText Typo="Typo.h4" Class="mb-4">Event Management</MudText>
+@if (!AuthStateService.IsAuthenticated)
+{
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+        <MudCard>
+            <MudCardContent>
+                <MudAlert Severity="Severity.Warning" Class="mb-4">
+                    <MudText Typo="Typo.h6">Access Denied</MudText>
+                    <MudText>You must be logged in as an administrator to access this page.</MudText>
+                </MudAlert>
+                <MudButton Variant="Variant.Filled" 
+                          Color="Color.Primary" 
+                          StartIcon="Icons.Material.Filled.Login"
+                          @onclick="NavigateToLogin">
+                    Go to Login
+                </MudButton>
+            </MudCardContent>
+        </MudCard>
+    </MudContainer>
+}
+else
+{
+    <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+        <MudText Typo="Typo.h4" Class="mb-4">Event Management</MudText>
     
     <MudCard Class="mb-4">
         <MudCardContent>
@@ -22,62 +43,56 @@
                               @onclick="ShowCreateEventDialog">
                         Add Event
                     </MudButton>
-                    <MudButton Variant="Variant.Outlined" 
+                    @* <MudButton Variant="Variant.Outlined" 
                               Color="Color.Secondary" 
                               StartIcon="Icons.Material.Filled.DateRange"
                               @onclick="GenerateWeeklyEvents">
                         Generate Weekly Events
-                    </MudButton>
+                    </MudButton> *@
                 </div>
             </div>
             
-            @if (EventDataService.Events.Any())
-            {
-                <MudTable Items="@EventDataService.Events" Hover="true" Striped="true" Dense="true">
-                    <HeaderContent>
-                        <MudTh>Event Name</MudTh>
-                        <MudTh>Date</MudTh>
-                        <MudTh>Check-in Status</MudTh>
-                        <MudTh>Participants</MudTh>
-                        <MudTh>Actions</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="Event Name">
-                            <MudText Typo="Typo.body2" Class="font-weight-bold">@context.Name</MudText>
-                            @if (!string.IsNullOrEmpty(context.Description))
+            @* Permanent Weekly Events *@
+            <MudTable Items="@GetPermanentWeeklyEvents()" Hover="true" Striped="true" Dense="true" Class="mb-4">
+                <HeaderContent>
+                    <MudTh>Event Name</MudTh>
+                    <MudTh>Date</MudTh>
+                    <MudTh>Check-in Status</MudTh>
+                    <MudTh>Actions</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Event Name">
+                        <MudText Typo="Typo.body2" Class="font-weight-bold">@context.Name</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">@context.Description</MudText>
+                    </MudTd>
+                    <MudTd DataLabel="Date">
+                        <MudText Typo="Typo.body2">@context.EventDate.ToString("MMM dd, yyyy")</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">@context.EventDate.ToString("dddd")</MudText>
+                    </MudTd>
+                    <MudTd DataLabel="Check-in Status">
+                        @if (context.IsCheckInEnabled)
+                        {
+                            <MudChip T="string" Color="Color.Success" Size="Size.Small" Variant="Variant.Filled">
+                                Enabled
+                            </MudChip>
+                            @if (context.CheckInStartTime.HasValue)
                             {
-                                <MudText Typo="Typo.caption" Color="Color.Secondary">@context.Description</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    Since @context.CheckInStartTime.Value.ToString("HH:mm")
+                                </MudText>
                             }
-                        </MudTd>
-                        <MudTd DataLabel="Date">
-                            <MudText Typo="Typo.body2">@context.EventDate.ToString("MMM dd, yyyy")</MudText>
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">@context.EventDate.ToString("dddd")</MudText>
-                        </MudTd>
-                        <MudTd DataLabel="Check-in Status">
-                            @if (context.IsCheckInEnabled)
+                        }
+                        else
+                        {
+                            <MudChip T="string" Color="Color.Default" Size="Size.Small" Variant="Variant.Outlined">
+                                Disabled
+                            </MudChip>
+                        }
+                    </MudTd>
+                    <MudTd DataLabel="Actions">
+                        <div class="d-flex gap-1">
+                            @if (context.Status == EventStatus.Active)
                             {
-                                <MudChip T="string" Color="Color.Success" Size="Size.Small" Variant="Variant.Filled">
-                                    Enabled
-                                </MudChip>
-                                @if (context.CheckInStartTime.HasValue)
-                                {
-                                    <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                        Since @context.CheckInStartTime.Value.ToString("HH:mm")
-                                    </MudText>
-                                }
-                            }
-                            else
-                            {
-                                <MudChip T="string" Color="Color.Default" Size="Size.Small" Variant="Variant.Outlined">
-                                    Disabled
-                                </MudChip>
-                            }
-                        </MudTd>
-                        <MudTd DataLabel="Participants">
-                            <MudText Typo="Typo.body2">0 / @context.MaxParticipants</MudText>
-                        </MudTd>
-                        <MudTd DataLabel="Actions">
-                            <div class="d-flex gap-1">
                                 @if (context.IsCheckInEnabled)
                                 {
                                     <MudButton Variant="Variant.Text" 
@@ -98,44 +113,76 @@
                                         Enable
                                     </MudButton>
                                 }
-                                @if (context.EventDate.Date < DateTime.Today)
-                                {
-                                    <MudButton Variant="Variant.Text" 
-                                              Color="Color.Info" 
-                                              Size="Size.Small"
-                                              StartIcon="Icons.Material.Filled.Archive"
-                                              @onclick="@(() => ArchiveEvent(context.Id))">
-                                        Archive
-                                    </MudButton>
-                                }
                                 <MudButton Variant="Variant.Text" 
-                                          Color="Color.Error" 
+                                          Color="Color.Warning" 
                                           Size="Size.Small"
-                                          StartIcon="Icons.Material.Filled.Delete"
-                                          @onclick="@(() => DeleteEvent(context.Id))">
-                                    Delete
+                                          StartIcon="Icons.Material.Filled.Cancel"
+                                          @onclick="@(() => CancelEvent(context.Id))">
+                                    Cancel
                                 </MudButton>
-                            </div>
-                        </MudTd>
-                    </RowTemplate>
-                </MudTable>
-            }
-            else
-            {
-                <MudText Typo="Typo.body2" Color="Color.Secondary">No events found. Create your first event or generate weekly events.</MudText>
-            }
+                            }
+                            else if (context.Status == EventStatus.Canceled)
+                            {
+                                <MudButton Variant="Variant.Text" 
+                                          Color="Color.Success" 
+                                          Size="Size.Small"
+                                          StartIcon="Icons.Material.Filled.Restore"
+                                          @onclick="@(() => UncancelEvent(context.Id))">
+                                    Uncancel
+                                </MudButton>
+                            }
+                            @if (context.EventDate.Date < DateTime.Today)
+                            {
+                                <MudButton Variant="Variant.Text" 
+                                          Color="Color.Info" 
+                                          Size="Size.Small"
+                                          StartIcon="Icons.Material.Filled.Archive"
+                                          @onclick="@(() => ArchiveEvent(context.Id))">
+                                    Archive
+                                </MudButton>
+                            }
+                            <MudButton Variant="Variant.Text" 
+                                      Color="Color.Error" 
+                                      Size="Size.Small"
+                                      StartIcon="Icons.Material.Filled.Delete"
+                                      @onclick="@(() => DeleteEvent(context.Id))">
+                                Delete
+                            </MudButton>
+                        </div>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
         </MudCardContent>
     </MudCard>
-</MudContainer>
+    </MudContainer>
+}
 
 @code {
+
     protected override async Task OnInitializedAsync()
     {
         EventDataService.PropertyChanged += OnEventDataChanged;
+        CheckInService.PropertyChanged += OnCheckInServiceChanged;
+        AuthStateService.PropertyChanged += OnAuthStateChanged;
         await EventDataService.LoadEventsAsync();
     }
 
+    private void OnAuthStateChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void NavigateToLogin()
+    {
+        Navigation.NavigateTo("/admin");
+    }
+
     private void OnEventDataChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnCheckInServiceChanged(object? sender, PropertyChangedEventArgs e)
     {
         InvokeAsync(StateHasChanged);
     }
@@ -176,14 +223,64 @@
 
     private async Task EnableCheckIn(int eventId)
     {
-        await EventDataService.EnableCheckInAsync(eventId);
-        Snackbar.Add("Check-in enabled for this event!", Severity.Success);
+        // Check if this is a permanent weekly event (ID >= 1000)
+        if (eventId >= 1000)
+        {
+            // For permanent weekly events, we need to create a real event first
+            var permanentEvent = GetPermanentWeeklyEvents().FirstOrDefault(e => e.Id == eventId);
+            if (permanentEvent != null)
+            {
+                // Create a real event in the database
+                var realEvent = new Event
+                {
+                    Name = permanentEvent.Name,
+                    EventDate = permanentEvent.EventDate,
+                    Description = permanentEvent.Description,
+                    IsCheckInEnabled = true,
+                    CheckInStartTime = DateTime.Now,
+                    MaxParticipants = permanentEvent.MaxParticipants,
+                    Status = EventStatus.Active,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                };
+
+                await EventDataService.CreateEventAsync(realEvent);
+                Snackbar.Add("Check-in enabled for this event!", Severity.Success);
+            }
+        }
+        else
+        {
+            // For regular events, use the existing method
+            await EventDataService.EnableCheckInAsync(eventId);
+            Snackbar.Add("Check-in enabled for this event!", Severity.Success);
+        }
+
     }
 
     private async Task DisableCheckIn(int eventId)
     {
-        await EventDataService.DisableCheckInAsync(eventId);
-        Snackbar.Add("Check-in disabled for this event!", Severity.Info);
+        // Check if this is a template event (ID >= 1000) that needs to find the real event
+        if (eventId >= 1000)
+        {
+            // For template events, find and disable the corresponding real event
+            var templateEvent = GetPermanentWeeklyEvents().FirstOrDefault(e => e.Id == eventId);
+            if (templateEvent != null)
+            {
+                // Find the real event with the same date
+                var realEvent = EventDataService.Events.FirstOrDefault(e => e.EventDate.Date == templateEvent.EventDate.Date);
+                if (realEvent != null)
+                {
+                    await EventDataService.DisableCheckInAsync(realEvent.Id);
+                    Snackbar.Add("Check-in disabled for this event!", Severity.Info);
+                }
+            }
+        }
+        else
+        {
+            // For real events, use the existing method
+            await EventDataService.DisableCheckInAsync(eventId);
+            Snackbar.Add("Check-in disabled for this event!", Severity.Info);
+        }
     }
 
     private async Task ArchiveEvent(int eventId)
@@ -217,6 +314,81 @@
         }
     }
 
+    private async Task CancelEvent(int eventId)
+    {
+        var parameters = new DialogParameters<MudMessageBox>
+        {
+            { x => x.Title, "Cancel Event" },
+            { x => x.Message, "Are you sure you want to cancel this event? This will disable check-in and mark the event as canceled." },
+            { x => x.YesText, "Cancel Event" },
+            { x => x.NoText, "Keep Active" }
+        };
+
+        var options = new DialogOptions() 
+        { 
+            CloseButton = true, 
+            MaxWidth = MaxWidth.Small 
+        };
+
+        var dialog = await DialogService.ShowAsync<MudMessageBox>("Cancel Event", parameters, options);
+        var result = await dialog.Result;
+
+        if (result != null && !result.Canceled)
+        {
+            await EventDataService.CancelEventAsync(eventId);
+            Snackbar.Add("Event canceled successfully!", Severity.Warning);
+        }
+    }
+
+    private async Task UncancelEvent(int eventId)
+    {
+        await EventDataService.UncancelEventAsync(eventId);
+        Snackbar.Add("Event restored to active status!", Severity.Success);
+    }
+
+
+    private List<Event> GetPermanentWeeklyEvents()
+    {
+        var events = new List<Event>();
+        var currentDate = DateTime.Today;
+        
+        // Find the next Tuesday
+        var daysUntilTuesday = ((int)DayOfWeek.Tuesday - (int)currentDate.DayOfWeek + 7) % 7;
+        if (daysUntilTuesday == 0 && currentDate.DayOfWeek == DayOfWeek.Tuesday)
+        {
+            daysUntilTuesday = 7; // If today is Tuesday, get next Tuesday
+        }
+        
+        var nextTuesday = currentDate.AddDays(daysUntilTuesday);
+        
+        // Generate next 12 Tuesdays
+        for (int i = 0; i < 12; i++)
+        {
+            var eventDate = nextTuesday.AddDays(i * 7);
+            var eventName = $"Gym Night - {eventDate:MMM dd, yyyy}";
+            
+            // Check if a real event already exists for this date
+            var existingEvent = EventDataService.Events.FirstOrDefault(e => e.EventDate.Date == eventDate.Date);
+            
+            // Always show the event, but use real event data if it exists
+            events.Add(new Event
+            {
+                Id = existingEvent?.Id ?? (1000 + i), // Use real event ID if exists, otherwise template ID
+                Name = eventName,
+                EventDate = eventDate,
+                Description = $"Weekly gym night event on {eventDate:dddd, MMMM dd, yyyy}",
+                IsCheckInEnabled = existingEvent?.IsCheckInEnabled ?? false,
+                CheckInStartTime = existingEvent?.CheckInStartTime,
+                MaxParticipants = 28,
+                Status = existingEvent?.Status ?? EventStatus.Active,
+                CreatedAt = existingEvent?.CreatedAt ?? DateTime.Now,
+                UpdatedAt = existingEvent?.UpdatedAt ?? DateTime.Now
+            });
+        }
+        
+        return events;
+    }
+
     private async Task DeleteEvent(int eventId)
     {
         var parameters = new DialogParameters<MudMessageBox>
@@ -246,5 +418,7 @@
     public void Dispose()
     {
         EventDataService.PropertyChanged -= OnEventDataChanged;
+        CheckInService.PropertyChanged -= OnCheckInServiceChanged;
+        AuthStateService.PropertyChanged -= OnAuthStateChanged;
     }
 }

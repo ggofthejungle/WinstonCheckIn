@@ -67,6 +67,19 @@ a, .btn-link {
         content: "An error has occurred."
     }
 
+/* Print styles for signatures - remove borders/outlines when printing */
+@media print {
+    .signature,
+    .signature-canvas,
+    .signature-image,
+    canvas[id*="signature"],
+    img[src*="data:image/png"] {
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+    }
+}
+
 .loading-progress {
     position: relative;
     display: block;

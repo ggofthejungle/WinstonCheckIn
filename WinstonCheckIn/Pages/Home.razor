@@ -194,6 +194,15 @@
         <p class="count-indicator">@CheckInService.CheckInRecords.Count / 28 spots filled</p>
     </div>
 
+    @if (EventDataService.CurrentEvent != null)
+    {
+        <div class="status-section mb-4">
+            <div class="d-flex justify-content-center">
+                <StatusCircle Event="@EventDataService.CurrentEvent" CurrentParticipants="@CheckInService.CheckInRecords.Count" />
+            </div>
+        </div>
+    }
+
     @if (hasCheckedIn)
     {
         <div class="check-in-success">
@@ -266,7 +275,7 @@
                             <div class="signature-section">
                                 <MudText Typo="Typo.subtitle2" Class="mb-2">Please sign below:</MudText>
                                 <div class="signature-container">
-                                    <canvas id="signatureCanvas" width="400" height="150" style="border: 1px solid #ccc; border-radius: 4px; background: white; cursor: crosshair;" 
+                                    <canvas id="signatureCanvas" width="400" height="150" class="signature-canvas" style="border: 1px solid #ccc; border-radius: 4px; background: white; cursor: crosshair;" 
                                             @onmousedown="StartDrawing" @onmousemove="Draw" @onmouseup="StopDrawing" 
                                             @ontouchstart="StartDrawing" @ontouchmove="Draw" @ontouchend="StopDrawing"></canvas>
                                 </div>
@@ -304,8 +313,8 @@
     {
         <div class="mt-4">
             <MudAlert Severity="Severity.Info" Class="mb-4">
-                <MudText Typo="Typo.h6" Class="mb-2">Check-in Not Available</MudText>
-                <MudText>Check-in has not been enabled for today's event yet. Please check back later!</MudText>
+                <MudText Typo="Typo.h6" Class="mb-2">Next Available Gym</MudText>
+                <MudText>Next gym night: <strong>@GetNextTuesday()</strong></MudText>
             </MudAlert>
         </div>
     }
@@ -626,6 +635,21 @@
         }
         
         StateHasChanged();
+    }
+
+    private string GetNextTuesday()
+    {
+        var currentDate = DateTime.Today;
+        
+        // Find the next Tuesday
+        var daysUntilTuesday = ((int)DayOfWeek.Tuesday - (int)currentDate.DayOfWeek + 7) % 7;
+        if (daysUntilTuesday == 0 && currentDate.DayOfWeek == DayOfWeek.Tuesday)
+        {
+            daysUntilTuesday = 7; // If today is Tuesday, get next Tuesday
+        }
+        
+        var nextTuesday = currentDate.AddDays(daysUntilTuesday);
+        return nextTuesday.ToString("dddd, MMMM dd, yyyy");
     }
 
     public void Dispose()

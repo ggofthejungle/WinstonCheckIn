@@ -114,6 +114,25 @@ namespace WinstonCheckIn.Services
             OnPropertyChanged(nameof(CheckInRecords));
         }
 
+        public async Task<int> GetParticipantCountForEventAsync(int eventId)
+        {
+            try
+            {
+                var json = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", $"checkins_event_{eventId}");
+                if (!string.IsNullOrEmpty(json))
+                {
+                    var records = JsonSerializer.Deserialize<List<CheckInRecord>>(json) ?? new List<CheckInRecord>();
+                    return records.Count;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting participant count for event {eventId}: {ex.Message}");
+                return 0;
+            }
+        }
+
         public async Task ArchiveEventDataAsync(int eventId)
         {
             try

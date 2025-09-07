@@ -118,6 +118,31 @@ namespace WinstonCheckIn.Services
             }
         }
 
+        public async Task CancelEventAsync(int eventId)
+        {
+            var eventModel = _events.FirstOrDefault(e => e.Id == eventId);
+            if (eventModel != null)
+            {
+                eventModel.Status = EventStatus.Canceled;
+                eventModel.IsCheckInEnabled = false;
+                eventModel.UpdatedAt = DateTime.Now;
+                await SaveEventsAsync();
+                await LoadEventsAsync();
+            }
+        }
+
+        public async Task UncancelEventAsync(int eventId)
+        {
+            var eventModel = _events.FirstOrDefault(e => e.Id == eventId);
+            if (eventModel != null)
+            {
+                eventModel.Status = EventStatus.Active;
+                eventModel.UpdatedAt = DateTime.Now;
+                await SaveEventsAsync();
+                await LoadEventsAsync();
+            }
+        }
+
         public async Task<List<Event>> GenerateWeeklyEventsAsync(DateTime startDate, DateTime endDate)
         {
             var newEvents = new List<Event>();
@@ -181,7 +206,14 @@ namespace WinstonCheckIn.Services
         public bool IsCheckInEnabled { get; set; } = false;
         public DateTime? CheckInStartTime { get; set; }
         public int MaxParticipants { get; set; } = 28;
+        public EventStatus Status { get; set; } = EventStatus.Active;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
+    }
+
+    public enum EventStatus
+    {
+        Active,
+        Canceled
     }
 }
