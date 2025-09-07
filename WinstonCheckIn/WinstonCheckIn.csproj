@@ -15,6 +15,125 @@
 
     <ItemGroup>
         <None Remove="web.config" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css.map" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap.min.css" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css.map.gz" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css.map.br" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css.map" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css.gz" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css.br" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css.map.gz" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css.map.br" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css.map" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css.gz" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css.map.gz" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css.map.br" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css.gz" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css.br" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css.map.gz" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css.map.br" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css.map" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css.gz" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css.br" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.map.gz" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.map.br" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.map" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.gz" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.br" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map.gz" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map.br" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.gz" />
+        <None Remove="publish\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.br" />
+        <None Remove="publish\wwwroot\js\signature.js.br" />
+        <None Remove="publish\wwwroot\css\WinstonCss.css.gz" />
+        <None Remove="publish\wwwroot\_framework\icudt_EFIGS.tptq2av103.dat.gz" />
+        <None Remove="publish\wwwroot\_framework\icudt_EFIGS.tptq2av103.dat" />
+        <None Remove="publish\wwwroot\_framework\icudt_CJK.tjcz0u77k5.dat.gz" />
+        <None Remove="publish\wwwroot\_framework\dotnet.runtime.o8gq1i8bk6.js.br" />
+        <None Remove="publish\wwwroot\_framework\dotnet.runtime.o8gq1i8bk6.js" />
+        <None Remove="publish\wwwroot\_framework\dotnet.native.p4lwlf2bu1.wasm.gz" />
+        <None Remove="publish\wwwroot\_framework\dotnet.native.p4lwlf2bu1.wasm" />
+        <None Remove="publish\wwwroot\_framework\dotnet.native.hmanx9razn.js.gz" />
+        <None Remove="publish\wwwroot\_framework\dotnet.native.hmanx9razn.js.br" />
+        <None Remove="publish\wwwroot\_framework\blazor.webassembly.js.gz" />
+        <None Remove="publish\wwwroot\_framework\blazor.webassembly.js.br" />
+        <None Remove="publish\wwwroot\_framework\blazor.webassembly.js" />
+        <None Remove="publish\wwwroot\_framework\blazor.boot.json.gz" />
+        <None Remove="publish\wwwroot\_framework\blazor.boot.json.br" />
+        <None Remove="publish\wwwroot\_framework\WinstonCheckIn.d0mb6labls.wasm.br" />
+        <None Remove="publish\wwwroot\_framework\System.Transactions.Local.bxrfl7ri6w.wasm.gz" />
+        <None Remove="publish\wwwroot\_framework\System.Threading.Thread.gyvmuupc66.wasm.gz" />
+        <None Remove="publish\wwwroot\_framework\System.Threading.Thread.gyvmuupc66.wasm" />
+        <None Remove="publish\wwwroot\_framework\System.Threading.08b4gdlk70.wasm.br" />
+        <None Remove="publish\wwwroot\_framework\System.Text.RegularExpressions.msrot2q01v.wasm.gz" />
+        <None Remove="publish\wwwroot\_framework\System.Text.RegularExpressions.msrot2q01v.wasm" />
+        <None Remove="publish\wwwroot\_framework\System.Text.Json.nls5ecjsj2.wasm" />
+        <None Remove="publish\wwwroot\_framework\System.Security.Cryptography.0k4rxid8g5.wasm.gz" />
+        <None Remove="publish\wwwroot\_framework\System.Security.Cryptography.0k4rxid8g5.wasm" />
+        <None Remove="publish\wwwroot\_framework\System.Runtime.Serialization.Formatters.0ggnavlyxs.wasm" />
+        <None Remove="publish\wwwroot\_framework\System.Runtime.Numerics.nn5olb949u.wasm" />
+        <None Remove="publish\wwwroot\_framework\System.Runtime.InteropServices.jfjjdu5tp7.wasm" />
+        <None Remove="publish\wwwroot\_framework\System.Runtime.InteropServices.RuntimeInformation.8d020fu7in.wasm" />
+        <None Remove="publish\wwwroot\_framework\System.Runtime.7e5e04zu58.wasm.gz" />
+        <None Remove="publish\wwwroot\_framework\System.Runtime.7e5e04zu58.wasm.br" />
+        <None Remove="publish\wwwroot\_framework\System.Private.CoreLib.3kbxdezskm.wasm.br" />
+        <None Remove="publish\wwwroot\_framework\System.ObjectModel.y7rby05ciw.wasm.br" />
+        <None Remove="publish\wwwroot\_framework\System.Net.NetworkInformation.5adk9mablp.wasm.br" />
+        <None Remove="publish\wwwroot\_framework\System.Memory.o8y3rolqus.wasm.br" />
+        <None Remove="publish\wwwroot\_framework\System.Linq.Expressions.3ee09erw89.wasm.gz" />
+        <None Remove="publish\wwwroot\_framework\System.Drawing.w36gg13qvp.wasm" />
+        <None Remove="publish\wwwroot\_framework\System.Drawing.Primitives.k8al9xxdij.wasm.gz" />
+        <None Remove="publish\wwwroot\_framework\System.Data.Common.uhnlz0iih5.wasm" />
+        <None Remove="publish\wwwroot\_framework\System.Console.1oxxyors2c.wasm" />
+        <None Remove="publish\wwwroot\_framework\System.ComponentModel.ngcc612btm.wasm" />
+        <None Remove="publish\wwwroot\_framework\System.ComponentModel.TypeConverter.hn99mtdoy8.wasm.gz" />
+        <None Remove="publish\wwwroot\_framework\System.ComponentModel.TypeConverter.hn99mtdoy8.wasm" />
+        <None Remove="publish\wwwroot\_framework\System.ComponentModel.Primitives.4xp8kbzcvn.wasm" />
+        <None Remove="publish\wwwroot\_framework\System.Collections.NonGeneric.vgs41srmcc.wasm.gz" />
+        <None Remove="publish\wwwroot\_framework\System.Collections.NonGeneric.vgs41srmcc.wasm" />
+        <None Remove="publish\wwwroot\_framework\System.Collections.1u6hjc7bql.wasm.br" />
+        <None Remove="publish\wwwroot\_framework\SQLitePCLRaw.batteries_v2.3v5whd3evz.wasm.gz" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.JSInterop.5jrli6e7v0.wasm.br" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.JSInterop.5jrli6e7v0.wasm" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.Extensions.Logging.Abstractions.p6yoyn3026.wasm" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.Extensions.Logging.1atgmuzx1m.wasm" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.Extensions.Localization.Abstractions.ixsppbtym0.wasm.br" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.Extensions.DependencyModel.rjq50rcbn6.wasm.gz" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.Extensions.Configuration.Json.this79iyc7.wasm.gz" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.Extensions.Configuration.Json.this79iyc7.wasm" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.Extensions.Caching.Memory.fz46oclav6.wasm.gz" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.Extensions.Caching.Abstractions.f1hamdktgl.wasm.gz" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.Extensions.Caching.Abstractions.f1hamdktgl.wasm.br" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.EntityFrameworkCore.Sqlite.xshv3qaexz.wasm.gz" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.EntityFrameworkCore.Sqlite.xshv3qaexz.wasm.br" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.EntityFrameworkCore.Sqlite.xshv3qaexz.wasm" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.EntityFrameworkCore.Relational.yiif9wstb1.wasm.br" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.EntityFrameworkCore.Relational.yiif9wstb1.wasm" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.EntityFrameworkCore.Abstractions.rbw718ytt5.wasm.br" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.EntityFrameworkCore.9wkys5jmg6.wasm.gz" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.EntityFrameworkCore.9wkys5jmg6.wasm.br" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.AspNetCore.Components.WebAssembly.nsaww79p0s.wasm.br" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.AspNetCore.Components.WebAssembly.nsaww79p0s.wasm" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.AspNetCore.Components.Web.z92snw2zcg.wasm" />
+        <None Remove="publish\wwwroot\_framework\Microsoft.AspNetCore.Components.Forms.x80val28il.wasm.gz" />
+        <None Remove="publish\wwwroot\_content\MudBlazor\MudBlazor.min.css.br" />
+        <None Remove="publish\wwwroot\WinstonCheckIn.styles.css.br" />
+        <None Remove="publish\e_sqlite3.a" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="publish\wwwroot\lib\bootstrap\dist\css\" />
+      <Folder Include="publish\wwwroot\_content\MudBlazor\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="publish\wwwroot\_framework\blazor.boot.json" />
+      <Content Remove="publish\web.config" />
     </ItemGroup>
 
 </Project>
