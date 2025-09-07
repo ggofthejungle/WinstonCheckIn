@@ -174,7 +174,7 @@ else
         var dialog = await DialogService.ShowAsync<MudMessageBox>("Delete Record", parameters, options);
         var result = await dialog.Result;
 
-        if (result != null && !result.Canceled)
+        if (result != null && !result.Canceled && result.Data != null && (bool)result.Data)
         {
             await CheckInService.RemoveCheckIn(index);
         }
@@ -222,6 +222,10 @@ else
         html.AppendLine("body { font-family: Arial, sans-serif; margin: 3px; padding: 0; line-height: 1.1; font-size: 11px; }");
         html.AppendLine(".header { text-align: center; border-bottom: 1px solid #333; padding-bottom: 3px; margin-bottom: 5px; }");
         html.AppendLine(".header h1 { font-size: 14px; margin: 0; }");
+        html.AppendLine(".waiver-section { margin-bottom: 15px; padding: 8px; border: 1px solid #ccc; background-color: #f9f9f9; }");
+        html.AppendLine(".waiver-section h3 { font-size: 12px; margin: 0 0 5px 0; text-decoration: underline; }");
+        html.AppendLine(".waiver-section p { margin: 3px 0; font-size: 10px; }");
+        html.AppendLine(".records-section h3 { font-size: 12px; margin: 10px 0 5px 0; text-decoration: underline; }");
         html.AppendLine(".record { margin-bottom: 3px; padding: 2px; }");
         html.AppendLine(".signature { max-width: 45px; max-height: 18px; border: 1px solid #ccc; vertical-align: middle; }");
         html.AppendLine("@media print { body { margin: 2px; padding: 0; } .no-print { display: none; } .signature { border: none !important; outline: none !important; } }");
@@ -232,6 +236,21 @@ else
         html.AppendLine("<h1>Winston Check-In Records</h1>");
         html.AppendLine("<p>Salt Creek Rural Park District</p>");
         html.AppendLine("</div>");
+        
+        // Add waiver text
+        html.AppendLine("<div class=\"waiver-section\">");
+        html.AppendLine("<h3>Waiver & Release Agreement</h3>");
+        html.AppendLine("<p><strong>SALT CREEK RURAL PARK DISTRICT'S WAIVER & RELEASE OF ALL CLAIMS</strong></p>");
+        html.AppendLine("<p>Please read this form carefully and be aware that in registering yourself or your minor child/ward for participation in Salt Creek Rural Park District's programs you will be waiving any and all claims for injuries you or your child ward might sustain.</p>");
+        html.AppendLine("<p>I acknowledge that there are certain risks of physical injury to participants in the Salt Creek Park District's programs, and I agree to assume the full risk of any such injuries, damages or loss regardless of severity which I or my child ward may sustain as a result of participating in any activities connected or associated with any such programs.</p>");
+        html.AppendLine("<p>I hereby fully release and discharge the Park District, its officers, agents, servants and employees from any and all claims from injuries, damage or loss which may occur due to the participation of myself or my child ward in any Salt Creek Rural Park District programs.</p>");
+        html.AppendLine("<p>I further agree to defend, indemnify and hold harmless the Park District its officers, agents, servants and employees from any and all claims resulting from injuries, damages and losses sustained or arising out of, connected with or in any way associated with the activities of any programs that myself or my child/ward participated in.</p>");
+        html.AppendLine("<p>I also understand that photographs and videos are periodically taken of participants while they are engaged in programs, special events and park activities. I give my permission to Salt Creek Park District to use these photos in future publications.</p>");
+        html.AppendLine("<p><strong>THE SALT CREEK RURAL PARK DISTRICT HAS MY PERMISSION TO OBTAIN EMERGENCY MEDICAL ATTENTION WHEN REQUIRED. I HAVE READ AND FULLY UNDERSTAND THE ABOVE DETAILS AND WAIVER, I RELEASE ALL CLAIMS.</strong></p>");
+        html.AppendLine("</div>");
+        
+        html.AppendLine("<div class=\"records-section\">");
+        html.AppendLine("<h3>Check-In Records</h3>");
         
         foreach (var record in CheckInService.CheckInRecords)
         {
@@ -249,6 +268,8 @@ else
             
             html.AppendLine("</div>");
         }
+        
+        html.AppendLine("</div>"); // Close records-section
         
         html.AppendLine("</body>");
         html.AppendLine("</html>");

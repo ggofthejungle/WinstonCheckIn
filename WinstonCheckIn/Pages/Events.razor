@@ -302,7 +302,7 @@ else
         var dialog = await DialogService.ShowAsync<MudMessageBox>("Archive Event", parameters, options);
         var result = await dialog.Result;
 
-        if (result != null && !result.Canceled)
+        if (result != null && !result.Canceled && result.Data != null && (bool)result.Data)
         {
             // Archive the check-in data for this event
             await CheckInService.ArchiveEventDataAsync(eventId);
@@ -333,7 +333,7 @@ else
         var dialog = await DialogService.ShowAsync<MudMessageBox>("Cancel Event", parameters, options);
         var result = await dialog.Result;
 
-        if (result != null && !result.Canceled)
+        if (result != null && !result.Canceled && result.Data != null && (bool)result.Data)
         {
             await EventDataService.CancelEventAsync(eventId);
             Snackbar.Add("Event canceled successfully!", Severity.Warning);
@@ -408,7 +408,7 @@ else
         var dialog = await DialogService.ShowAsync<MudMessageBox>("Delete Event", parameters, options);
         var result = await dialog.Result;
 
-        if (result != null && !result.Canceled)
+        if (result != null && !result.Canceled && result.Data != null && (bool)result.Data)
         {
             await EventDataService.DeleteEventAsync(eventId);
             Snackbar.Add("Event deleted successfully!", Severity.Success);

@@ -25,6 +25,17 @@
 
     .company-header {
         margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .logo-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     .logo {
@@ -37,6 +48,12 @@
         font-size: 0.8em;
         color: #666;
         margin-top: 0;
+    }
+
+    .status-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .input-group {
@@ -189,19 +206,19 @@
 
 <div class="form-container">
     <div class="company-header">
-        <img src="images/winstonLogo.png" alt="Winston Logo" class="logo">
-        <p class="tagline">Winston Check-In</p>
-        <p class="count-indicator">@CheckInService.CheckInRecords.Count / 28 spots filled</p>
-    </div>
-
-    @if (EventDataService.CurrentEvent != null)
-    {
-        <div class="status-section mb-4">
-            <div class="d-flex justify-content-center">
+        <div class="logo-section">
+            <img src="images/winstonLogo.png" alt="Winston Logo" class="logo">
+            <p class="tagline">Winston Check-In</p>
+            <p class="count-indicator">@CheckInService.CheckInRecords.Count / 28 spots filled</p>
+        </div>
+        
+        @if (EventDataService.CurrentEvent != null)
+        {
+            <div class="status-section">
                 <StatusCircle Event="@EventDataService.CurrentEvent" CurrentParticipants="@CheckInService.CheckInRecords.Count" />
             </div>
-        </div>
-    }
+        }
+    </div>
 
     @if (hasCheckedIn)
     {
